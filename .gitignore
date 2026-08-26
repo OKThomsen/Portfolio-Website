@@ -1,0 +1,14 @@
+## .NET
+bin/
+obj/
+*.user
+
+## Environment secrets
+.env
+
+## Editor/OS
+.vs/
+.vscode/
+.idea/
+*.suo
+Thumbs.db
