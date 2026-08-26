@@ -3,9 +3,6 @@ bin/
 obj/
 *.user
 
-## Docs (local reference only, not part of the deployed site)
-*.md
-
 ## Environment secrets
 .env
 
