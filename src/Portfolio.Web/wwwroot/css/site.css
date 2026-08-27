@@ -76,8 +76,7 @@ h1, h2, h3 {
   padding: 1rem 1.5rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  gap: 1.5rem;
   flex-wrap: wrap;
 }
 
@@ -102,6 +101,24 @@ h1, h2, h3 {
 }
 
 .nav-links a:hover {
+  color: var(--color-text);
+}
+
+.nav-social {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0 0 0 auto;
+  padding: 0;
+}
+
+.nav-social a {
+  display: inline-flex;
+  color: var(--color-text-muted);
+}
+
+.nav-social a:hover {
   color: var(--color-text);
 }
 

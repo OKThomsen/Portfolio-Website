@@ -29,9 +29,11 @@ src/Portfolio.Web/
     Skill.cs                  Individual skill belonging to a SkillCategory
   Migrations/                 EF Core migrations (source of truth for schema)
   Pages/
-    Index.cshtml(.cs)         Single-page portfolio (hero/about/skills/projects/etc.)
+    Index.cshtml(.cs)         Home page: hero + skills + projects
+    About.cshtml(.cs)         About copy + education (static, no page model logic)
+    Contact.cshtml(.cs)       Contact details (static, no page model logic)
     Error.cshtml(.cs)         Default error page
-    Shared/_Layout.cshtml     Shared HTML shell
+    Shared/_Layout.cshtml     Shared HTML shell; header nav (About, Contact) + GitHub/LinkedIn icon links
   appsettings.json             Base config (no secrets)
   appsettings.Development.json Dev-only config, including the local DB connection string
 docker-compose.yml             Local SQL Server 2022 container
@@ -66,6 +68,10 @@ skill categories (with skills, ordered) and all `Featured` projects (with
 technologies, ordered) via two independent EF Core queries, and the Razor
 page renders them directly. There is no caching, view models, or mapping
 layer — the entity types are used directly by the view.
+
+`About` and `Contact` are static Razor Pages with empty page models. Their
+content (about copy, education entries, contact links) is hardcoded in the
+`.cshtml`, not sourced from the database.
 
 ## Configuration & secrets
 
