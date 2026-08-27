@@ -195,35 +195,74 @@ section > .section-inner.wide {
 
 /* Skills */
 .skill-groups {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
-  gap: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
   max-width: 60rem;
   margin: 0 auto;
 }
 
 .skill-group h3 {
   font-size: 0.95rem;
-  margin: 0 0 0.75rem;
+  margin: 0 0 1rem;
 }
 
-.skill-list {
+.skill-grid {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
+  flex-direction: column;
+  gap: 0.6rem;
 }
 
-.skill-list li {
+.skill-tile {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  transition: transform 0.18s ease;
+}
+
+.skill-tile:hover {
+  transform: translateY(-4px);
+}
+
+.skill-tile__icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0.45rem;
+  flex-shrink: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  object-fit: contain;
+}
+
+.skill-tile__icon--generic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+}
+
+.skill-tile__icon--generic svg {
+  width: 100%;
+  height: 100%;
+}
+
+.skill-tile__label {
   font-family: var(--font-mono);
   font-size: 0.8rem;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  padding: 0.25rem 0.55rem;
   color: var(--color-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skill-tile {
+    transition: none;
+  }
+  .skill-tile:hover {
+    transform: none;
+  }
 }
 
 /* Projects */

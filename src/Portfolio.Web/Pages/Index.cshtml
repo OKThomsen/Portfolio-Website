@@ -30,10 +30,26 @@
             {
                 <div class="skill-group">
                     <h3>@category.Name</h3>
-                    <ul class="skill-list">
+                    <ul class="skill-grid">
                         @foreach (var skill in category.Skills)
                         {
-                            <li>@skill.Name</li>
+                            var icon = IndexModel.IconFor(skill.Name);
+                            <li class="skill-tile">
+                                @if (icon is not null)
+                                {
+                                    <img class="skill-tile__icon" src="~/img/tech/@(icon).svg" alt="" width="40" height="40" loading="lazy" asp-append-version="true" />
+                                }
+                                else
+                                {
+                                    <span class="skill-tile__icon skill-tile__icon--generic" aria-hidden="true">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <rect x="3" y="3" width="18" height="18" rx="4" />
+                                            <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none" />
+                                        </svg>
+                                    </span>
+                                }
+                                <span class="skill-tile__label">@skill.Name</span>
+                            </li>
                         }
                     </ul>
                 </div>

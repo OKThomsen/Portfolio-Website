@@ -73,6 +73,12 @@ layer — the entity types are used directly by the view.
 content (about copy, education entries, contact links) is hardcoded in the
 `.cshtml`, not sourced from the database.
 
+The Skills section renders each skill as an icon tile (brand SVG + label,
+with a hover lift). Icons are vendored Devicon SVGs in
+`wwwroot/img/tech/<slug>.svg`; the skill-name → slug mapping lives in
+`IndexModel.IconBySkill` (presentation concern, kept out of the DB). Skills
+with no mapping fall back to a neutral inline glyph.
+
 ## Configuration & secrets
 
 - `ConnectionStrings:PortfolioDb` lives in `appsettings.Development.json`
