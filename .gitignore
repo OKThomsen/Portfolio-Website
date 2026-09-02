@@ -12,3 +12,11 @@ obj/
 .idea/
 *.suo
 Thumbs.db
+
+## Internal/working docs (keep README.md and DOCUMENTATION.md tracked)
+*.md
+!README.md
+!DOCUMENTATION.md
+
+## Personal CV source (the served copy in wwwroot/files stays tracked)
+/CV.pdf
