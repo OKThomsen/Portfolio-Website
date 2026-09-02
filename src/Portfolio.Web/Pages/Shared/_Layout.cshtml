@@ -8,6 +8,46 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
+    <div class="site-bg" aria-hidden="true">
+        <svg class="site-bg__wave" viewBox="0 0 1440 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <path id="wave-a" fill="none" stroke="currentColor" stroke-width="1.3" vector-effect="non-scaling-stroke"
+                      d="M -120 180 C 220 40 380 300 640 220 C 900 140 1060 420 1560 300" />
+                <path id="wave-b" fill="none" stroke="currentColor" stroke-width="1.3" vector-effect="non-scaling-stroke"
+                      d="M -120 380 C 260 260 460 520 720 400 C 980 280 1180 520 1560 460" />
+            </defs>
+            <g>
+                <use href="#wave-a" y="-56" opacity="0.12" />
+                <use href="#wave-a" y="-48" opacity="0.18" />
+                <use href="#wave-a" y="-40" opacity="0.26" />
+                <use href="#wave-a" y="-32" opacity="0.34" />
+                <use href="#wave-a" y="-24" opacity="0.42" />
+                <use href="#wave-a" y="-16" opacity="0.50" />
+                <use href="#wave-a" y="-8" opacity="0.56" />
+                <use href="#wave-a" y="0" opacity="0.60" />
+                <use href="#wave-a" y="8" opacity="0.56" />
+                <use href="#wave-a" y="16" opacity="0.50" />
+                <use href="#wave-a" y="24" opacity="0.42" />
+                <use href="#wave-a" y="32" opacity="0.34" />
+                <use href="#wave-a" y="40" opacity="0.26" />
+                <use href="#wave-a" y="48" opacity="0.18" />
+                <use href="#wave-a" y="56" opacity="0.12" />
+            </g>
+            <g>
+                <use href="#wave-b" y="-40" opacity="0.08" />
+                <use href="#wave-b" y="-32" opacity="0.14" />
+                <use href="#wave-b" y="-24" opacity="0.22" />
+                <use href="#wave-b" y="-16" opacity="0.30" />
+                <use href="#wave-b" y="-8" opacity="0.36" />
+                <use href="#wave-b" y="0" opacity="0.40" />
+                <use href="#wave-b" y="8" opacity="0.36" />
+                <use href="#wave-b" y="16" opacity="0.30" />
+                <use href="#wave-b" y="24" opacity="0.22" />
+                <use href="#wave-b" y="32" opacity="0.14" />
+                <use href="#wave-b" y="40" opacity="0.08" />
+            </g>
+        </svg>
+    </div>
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
         <nav class="site-nav" aria-label="Primary">
@@ -43,6 +83,7 @@
         <p>&copy; @DateTime.UtcNow.Year Oskar Kjær Thomsen</p>
     </footer>
 
+    <script src="~/js/site.js" asp-append-version="true" defer></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -430,3 +430,92 @@ section > .section-inner.wide {
     padding: 2.5rem 1.25rem;
   }
 }
+
+/* Animated background wave
+   The wave is a static inline SVG (stroke = currentColor). Per-section CSS
+   custom properties, set via body[data-section] by site.js, drive a subtle
+   tint shift plus a slow vertical drift/scale as the visitor moves down. */
+.site-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  /* Tunable per section (defaults match the hero state).
+     Effective line opacity = --wave-opacity * each stroke's own opacity
+     (see the <use> ramp in _Layout.cshtml), so keep this the master dimmer. */
+  --wave-color: #6ea8dc;
+  --wave-opacity: 0.45;
+  --wave-shift: 0px;
+  --wave-rotate: 0deg;
+  --wave-scale: 1;
+  color: var(--wave-color);
+  opacity: var(--wave-opacity);
+}
+
+.site-bg__wave {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 140%;
+  height: 140%;
+  transform: translate3d(-50%, calc(-50% + var(--wave-shift)), 0)
+    rotate(var(--wave-rotate)) scale(var(--wave-scale));
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+body.bg-ready .site-bg {
+  transition: color 900ms ease, opacity 900ms ease;
+}
+
+body.bg-ready .site-bg__wave {
+  transition: transform 1200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Keep page content above the wave. */
+#main,
+.site-footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* Per-section states — subtle, kept within the blue family. */
+body[data-section="hero"] .site-bg {
+  --wave-color: #6ea8dc;
+  --wave-opacity: 0.45;
+  --wave-shift: 0px;
+  --wave-rotate: 0deg;
+  --wave-scale: 1;
+}
+
+body[data-section="skills"] .site-bg {
+  --wave-color: #5aa6c6;
+  --wave-opacity: 0.38;
+  --wave-shift: -46px;
+  --wave-rotate: -1.6deg;
+  --wave-scale: 1.05;
+}
+
+body[data-section="projects"] .site-bg {
+  --wave-color: #7183d2;
+  --wave-opacity: 0.34;
+  --wave-shift: -96px;
+  --wave-rotate: 2deg;
+  --wave-scale: 1.09;
+}
+
+@media (max-width: 40rem) {
+  .site-bg {
+    --wave-opacity: 0.3 !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.bg-ready .site-bg__wave {
+    transition: none;
+  }
+  .site-bg__wave {
+    transform: translate3d(-50%, -50%, 0);
+  }
+}
