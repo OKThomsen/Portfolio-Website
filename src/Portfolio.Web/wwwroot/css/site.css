@@ -137,11 +137,28 @@ section:last-of-type {
   border-bottom: none;
 }
 
-/* Scroll-to-next-section cue */
+/* Multi-section views (home, about): each section is one full screen tall so
+   it reads as a distinct "slide", with its content vertically centered and
+   any scroll cue pinned to the bottom edge. Full 100svh (not minus the
+   header) so the centered content lines up with the fixed, full-viewport
+   background wave. Single-section views like Contact keep normal
+   content-height sections. */
+.full-sections section {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Scroll-to-next-section cue — pinned to the bottom edge of its section */
 .scroll-cue {
   display: flex;
   justify-content: center;
-  margin-top: clamp(2.5rem, 6vw, 4rem);
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(1.5rem, 4vh, 2.75rem);
 }
 
 .scroll-cue a {
@@ -428,6 +445,14 @@ section > .section-inner.wide {
 @media (max-width: 40rem) {
   section {
     padding: 2.5rem 1.25rem;
+  }
+
+  /* Don't force a full screen on small viewports — tall stacked content
+     (e.g. the skills list) would overflow and get clipped by centering. */
+  .full-sections section {
+    min-height: auto;
+    justify-content: flex-start;
+    padding-bottom: 5rem;
   }
 }
 
