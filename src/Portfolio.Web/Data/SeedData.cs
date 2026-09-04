@@ -87,7 +87,7 @@ public static class SeedData
                     Purpose = "The Danish EPA (Miljøstyrelsen) wanted a way to detect when farmers were applying excessive pre-harvest desiccant to potato crops. This master's thesis project used satellite data to calculate vegetation indices over the desiccation period, where an unusually steep drop in vegetation index can indicate overuse.",
                     Contribution = "TODO — Oskar to confirm individual contribution details for the site copy.",
                     EngineeringNotes = "Pulled and processed Sentinel-2 API data, computed vegetation indices across the desiccation window, and used RabbitMQ and Docker to structure the data processing pipeline, with results stored in MySQL.",
-                    RepositoryUrl = null, // TODO: repo exists but is currently private — link once visibility is fixed
+                    RepositoryUrl = "https://github.com/anton4d/Satellite-Based_Detection_of_Pesticide_Overuse",
                     HasDetailPage = true,
                     Featured = true,
                     SortOrder = 1,
