@@ -151,14 +151,18 @@ section:last-of-type {
   justify-content: center;
 }
 
-/* Scroll-to-next-section cue — pinned to the bottom edge of its section */
+/* Scroll-to-next-section cue — pinned near the bottom of the *viewport*.
+   Sections are a full 100svh tall but start below the sticky header, so the
+   section's own bottom edge sits header-height below the fold; add that
+   clearance (matching the header offset used by scroll-margin-top below)
+   or the cue would land off-screen and need a scroll to reach. */
 .scroll-cue {
   display: flex;
   justify-content: center;
   position: absolute;
   left: 0;
   right: 0;
-  bottom: clamp(1.5rem, 4vh, 2.75rem);
+  bottom: calc(4.5rem + clamp(1rem, 2vh, 1.5rem));
 }
 
 .scroll-cue a {
@@ -453,6 +457,13 @@ section > .section-inner.wide {
     min-height: auto;
     justify-content: flex-start;
     padding-bottom: 5rem;
+  }
+
+  /* No sticky-header clearance needed here — sections aren't forced to
+     100svh on small screens, so the cue sits right in the reserved
+     padding-bottom above, not off-screen past the fold. */
+  .scroll-cue {
+    bottom: clamp(1.5rem, 4vh, 2.75rem);
   }
 }
 
