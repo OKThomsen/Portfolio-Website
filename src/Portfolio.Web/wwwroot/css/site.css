@@ -12,6 +12,7 @@
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
   --content-width: 42rem;
   --space-section: clamp(4.5rem, 10vw, 8rem);
+  --footer-height: 0px;
 }
 
 * {
@@ -210,6 +211,12 @@ section:last-of-type {
 }
 
 .section-inner {
+  /* width:100% so the box always fills --content-width and its left edge
+     lines up across sections. Without it, a flex-column section centers this
+     via the auto margins at its shrink-to-fit content width, so a section
+     with short content (e.g. Education) ends up narrower and visibly indented
+     relative to text-heavy sections like About. */
+  width: 100%;
   max-width: var(--content-width);
   margin: 0 auto;
 }
@@ -464,6 +471,20 @@ section > .section-inner.wide {
      padding-bottom above, not off-screen past the fold. */
   .scroll-cue {
     bottom: clamp(1.5rem, 4vh, 2.75rem);
+  }
+}
+
+/* The last full-bleed section (e.g. Education on the About page) sits flush
+   against the footer instead of another 100svh section. Scrolled all the way
+   down, the footer eats into the bottom of its box, so content centered on
+   the full 100svh would sit visibly above true center. Reserve the footer's
+   real height (set on --footer-height by site.js) so it centers within the
+   space actually visible above the footer instead. Scoped to the same
+   breakpoint as the full-height behavior above — on narrow screens sections
+   already collapse to auto height and this doesn't apply. */
+@media (min-width: 40.0625rem) {
+  .full-sections section:last-of-type {
+    min-height: calc(100svh - var(--footer-height));
   }
 }
 

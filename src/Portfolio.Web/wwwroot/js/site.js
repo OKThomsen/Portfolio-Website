@@ -9,6 +9,22 @@
     body.classList.add("bg-ready");
   });
 
+  // Publish the footer's real rendered height so the last full-bleed
+  // section (see site.css) can size itself to exactly the space visible
+  // above the footer, instead of the footer cutting into a 100svh box and
+  // pushing its centered content off-center.
+  var footer = document.querySelector(".site-footer");
+  if (footer) {
+    var updateFooterHeight = function () {
+      document.documentElement.style.setProperty(
+        "--footer-height",
+        footer.offsetHeight + "px"
+      );
+    };
+    updateFooterHeight();
+    window.addEventListener("resize", updateFooterHeight);
+  }
+
   var sections = document.querySelectorAll("main section[id]");
   if (!sections.length || !("IntersectionObserver" in window)) {
     return;
