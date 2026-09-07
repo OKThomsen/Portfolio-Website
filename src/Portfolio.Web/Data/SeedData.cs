@@ -56,10 +56,13 @@ public static class SeedData
                     SortOrder = 4,
                     Skills =
                     [
-                        new Skill { Name = "Docker", SortOrder = 1 },
-                        new Skill { Name = "Kubernetes", SortOrder = 2 },
-                        new Skill { Name = "Git", SortOrder = 3 },
-                        new Skill { Name = "CI/CD", SortOrder = 4 },
+                        new Skill { Name = "Linux", SortOrder = 1 },
+                        new Skill { Name = "Docker", SortOrder = 2 },
+                        new Skill { Name = "Kubernetes", SortOrder = 3 },
+                        new Skill { Name = "Azure", SortOrder = 4 },
+                        new Skill { Name = "Google Cloud", SortOrder = 5 },
+                        new Skill { Name = "CI/CD", SortOrder = 6 },
+                        new Skill { Name = "Git", SortOrder = 7 },
                     ]
                 },
                 new SkillCategory
