@@ -222,7 +222,7 @@ section:last-of-type {
 }
 
 section > .section-inner.wide {
-  max-width: 60rem;
+  max-width: 72rem;
 }
 
 /* Hero */
@@ -276,9 +276,11 @@ section > .section-inner.wide {
 /* Skills */
 .skill-groups {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  /* 6 column slots so all five categories sit on one row — "Cloud & DevOps"
+     spans two of them (see .skill-group--wide). */
+  grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
   gap: 2rem 1.5rem;
-  max-width: 60rem;
+  max-width: 72rem;
   margin: 0 auto;
 }
 
@@ -364,8 +366,10 @@ section > .section-inner.wide {
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
+  /* Cards stay at a readable width; left-aligned (not centered) so their edge
+     lines up with the section heading and the wider skills grid above. */
   max-width: 60rem;
-  margin: 0 auto;
+  margin: 0;
 }
 
 .project-card {
