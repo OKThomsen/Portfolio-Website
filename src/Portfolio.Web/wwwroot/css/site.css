@@ -291,9 +291,22 @@ section > .section-inner.wide {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-auto-flow: row;
   gap: 0.6rem;
+}
+
+/* Wide groups cap at 5 rows, then wrap into a second column under the
+   same heading instead of growing one tall column. */
+.skill-group--wide {
+  grid-column: span 2;
+}
+
+.skill-group--wide .skill-grid {
+  grid-auto-flow: column;
+  grid-template-rows: repeat(5, auto);
+  grid-auto-columns: minmax(0, 1fr);
+  column-gap: 1.5rem;
 }
 
 .skill-tile {
@@ -471,6 +484,13 @@ section > .section-inner.wide {
      padding-bottom above, not off-screen past the fold. */
   .scroll-cue {
     bottom: clamp(1.5rem, 4vh, 2.75rem);
+  }
+
+  /* Not enough width for a second column of tiles — stack like every
+     other group. */
+  .skill-group--wide .skill-grid {
+    grid-auto-flow: row;
+    grid-template-rows: none;
   }
 }
 
