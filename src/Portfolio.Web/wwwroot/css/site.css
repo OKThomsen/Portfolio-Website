@@ -276,45 +276,37 @@ section > .section-inner.wide {
 /* Skills */
 .skill-groups {
   display: grid;
-  /* 6 column slots so all five categories sit on one row — "Cloud & DevOps"
-     spans two of them (see .skill-group--wide). */
-  grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
-  gap: 2rem 1.5rem;
+  /* One row of category columns; each category is a 2-wide icon grid that
+     grows downward as it gains skills. */
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 2.5rem 2rem;
   max-width: 72rem;
   margin: 0 auto;
 }
 
 .skill-group h3 {
-  font-size: 0.95rem;
-  margin: 0 0 1rem;
+  font-size: 1rem;
+  margin: 0 0 1.25rem;
 }
 
 .skill-grid {
   list-style: none;
   margin: 0;
   padding: 0;
+  /* Two fixed-width columns of tiles, packed at the group's left edge under
+     the heading. */
   display: grid;
-  grid-auto-flow: row;
-  gap: 0.6rem;
-}
-
-/* Wide groups cap at 5 rows, then wrap into a second column under the
-   same heading instead of growing one tall column. */
-.skill-group--wide {
-  grid-column: span 2;
-}
-
-.skill-group--wide .skill-grid {
-  grid-auto-flow: column;
-  grid-template-rows: repeat(5, auto);
-  grid-auto-columns: minmax(0, 1fr);
-  column-gap: 1.5rem;
+  grid-template-columns: repeat(2, 5rem);
+  justify-content: start;
+  gap: 1.5rem 1.25rem;
 }
 
 .skill-tile {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.8rem;
+  gap: 0.55rem;
+  text-align: center;
   transition: transform 0.18s ease;
 }
 
@@ -323,12 +315,12 @@ section > .section-inner.wide {
 }
 
 .skill-tile__icon {
-  width: 2.75rem;
-  height: 2.75rem;
-  padding: 0.45rem;
+  width: 4.25rem;
+  height: 4.25rem;
+  padding: 0.7rem;
   flex-shrink: 0;
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: 12px;
   background: var(--color-surface);
   object-fit: contain;
 }
@@ -341,14 +333,16 @@ section > .section-inner.wide {
 }
 
 .skill-tile__icon--generic svg {
-  width: 100%;
+  width: auto;
   height: 100%;
+  aspect-ratio: 1;
 }
 
 .skill-tile__label {
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   line-height: 1.3;
+  max-width: 6rem;
   color: var(--color-text-muted);
 }
 
@@ -488,13 +482,6 @@ section > .section-inner.wide {
      padding-bottom above, not off-screen past the fold. */
   .scroll-cue {
     bottom: clamp(1.5rem, 4vh, 2.75rem);
-  }
-
-  /* Not enough width for a second column of tiles — stack like every
-     other group. */
-  .skill-group--wide .skill-grid {
-    grid-auto-flow: row;
-    grid-template-rows: none;
   }
 }
 

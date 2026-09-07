@@ -30,10 +30,7 @@
         <div class="skill-groups">
             @foreach (var category in Model.SkillCategories)
             {
-                // Categories with more than 5 skills flow into a second column
-                // under the same heading rather than growing a tall single column.
-                var wide = category.Skills.Count > 5;
-                <div class="skill-group@(wide ? " skill-group--wide" : "")">
+                <div class="skill-group">
                     <h3>@category.Name</h3>
                     <ul class="skill-grid">
                         @foreach (var skill in category.Skills)
