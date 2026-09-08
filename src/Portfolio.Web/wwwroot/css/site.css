@@ -225,6 +225,13 @@ section > .section-inner.wide {
   max-width: 72rem;
 }
 
+/* Skills needs more room than the shared "wide" cap: at the widened tile
+   size (see .skill-grid) below, 5 category columns need ~83rem to stay on
+   one row like the other "wide" sections' content does. */
+#skills > .section-inner.wide {
+  max-width: 88rem;
+}
+
 /* Hero */
 .hero {
   padding-top: clamp(4rem, 12vw, 7rem);
@@ -278,9 +285,9 @@ section > .section-inner.wide {
   display: grid;
   /* One row of category columns; each category is a 2-wide icon grid that
      grows downward as it gains skills. */
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
   gap: 2.5rem 2rem;
-  max-width: 72rem;
+  max-width: 88rem;
   margin: 0 auto;
 }
 
@@ -296,9 +303,9 @@ section > .section-inner.wide {
   /* Two fixed-width columns of tiles, packed at the group's left edge under
      the heading. */
   display: grid;
-  grid-template-columns: repeat(2, 5rem);
+  grid-template-columns: repeat(2, 6.5rem);
   justify-content: start;
-  gap: 1.5rem 1.25rem;
+  gap: 1.75rem 1.5rem;
 }
 
 .skill-tile {
@@ -315,9 +322,9 @@ section > .section-inner.wide {
 }
 
 .skill-tile__icon {
-  width: 4.25rem;
-  height: 4.25rem;
-  padding: 0.7rem;
+  width: 5rem;
+  height: 5rem;
+  padding: 0.8rem;
   flex-shrink: 0;
   border: 1px solid var(--color-border);
   border-radius: 12px;
@@ -342,7 +349,12 @@ section > .section-inner.wide {
   font-family: var(--font-mono);
   font-size: 0.78rem;
   line-height: 1.3;
-  max-width: 6rem;
+  max-width: 8rem;
+  /* Reserve room for a 2-line label (the longest name, "Entity Framework
+     Core", wraps to 2 lines at this width) so every tile in a row is the
+     same total height and rows stay aligned across categories regardless
+     of how many lines a given label wraps to. */
+  min-height: calc(0.78rem * 1.3 * 2);
   color: var(--color-text-muted);
 }
 
