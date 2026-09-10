@@ -6,23 +6,47 @@
 }
 
 <section id="about">
-    <div class="section-inner">
+    <div class="section-inner wide">
         <h1>Background</h1>
-        <!-- DRAFT copy for Oskar to review/edit before publishing -->
-        <p>
-            I finished a Master's in Software Engineering at the University of
-            Southern Denmark in 2025, after a Bachelor's in the same program. My
-            project work spans backend and data-processing systems &mdash; from a
-            satellite-imagery pipeline built for the Danish Environmental Protection
-            Agency to a microservice-based streaming platform mockup and an embedded
-            wildlife-monitoring system that uses a local LLM for image annotation.
-        </p>
-        <p>
-            I'm currently focused on moving into the Microsoft ecosystem &mdash;
-            ASP.NET Core, Entity Framework Core, SQL Server, and Azure &mdash; and
-            this site is built on that stack as a working example of it, not just a
-            claim on a resume.
-        </p>
+        <div class="about-layout">
+            <div class="about-prose">
+                <!-- DRAFT copy for Oskar to review/edit before publishing -->
+                <p>
+                    I finished a Master's in Software Engineering at the University of
+                    Southern Denmark in 2025, after a Bachelor's in the same program. My
+                    project work spans backend and data-processing systems &mdash; from a
+                    satellite-imagery pipeline built for the Danish Environmental Protection
+                    Agency to a microservice-based streaming platform mockup and an embedded
+                    wildlife-monitoring system that uses a local LLM for image annotation.
+                </p>
+                <p>
+                    I'm currently focused on moving into the Microsoft ecosystem &mdash;
+                    ASP.NET Core, Entity Framework Core, SQL Server, and Azure &mdash; and
+                    this site is built on that stack as a working example of it, not just a
+                    claim on a resume.
+                </p>
+            </div>
+            <aside class="about-aside">
+                <div class="about-card">
+                    <p class="eyebrow">Recent project</p>
+                    <h3>This portfolio site</h3>
+                    <p>
+                        Built with ASP.NET Core Razor Pages, Entity Framework Core, and SQL
+                        Server. The projects and skills shown here are served from the
+                        database through EF Core rather than hard-coded into the markup.
+                    </p>
+                </div>
+                <div class="about-card about-card--cta">
+                    <p class="eyebrow">Want to work together?</p>
+                    <h3>Open to software engineering roles</h3>
+                    <p>
+                        I'm looking for backend and cloud work with C#/.NET, SQL, and Azure.
+                        If that's what you're hiring for, get in touch.
+                    </p>
+                    <a class="btn primary" asp-page="/Contact">Go to contact</a>
+                </div>
+            </aside>
+        </div>
     </div>
     <div class="scroll-cue">
         <a href="#education" aria-label="Scroll to Education">
