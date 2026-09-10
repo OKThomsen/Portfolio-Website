@@ -151,7 +151,7 @@ public static class SeedData
                     Purpose = "Built as a deliberate showcase: rather than just listing .NET/Azure as target technologies, the portfolio site itself is implemented in ASP.NET Core with EF Core and SQL Server, containerized with Docker.",
                     Contribution = "Designed and built solo, including the data model, seed content pipeline, and layout.",
                     EngineeringNotes = "Razor Pages over a SQL Server database via EF Core; project and skill content is modeled as real data rather than hardcoded markup.",
-                    RepositoryUrl = null, // TODO: publish this repo to GitHub and link it here
+                    RepositoryUrl = "https://github.com/OKThomsen/Portfolio-Website",
                     HasDetailPage = false,
                     Featured = true,
                     SortOrder = 4,
