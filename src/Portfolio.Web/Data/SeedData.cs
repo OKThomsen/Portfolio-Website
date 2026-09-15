@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Portfolio.Web.Models;
 
 namespace Portfolio.Web.Data;
@@ -164,6 +165,60 @@ public static class SeedData
                     ]
                 }
             );
+        }
+
+        if (!db.BlogPosts.Any())
+        {
+            // The Projects block above may have just added this entity in-memory without
+            // saving yet, so check the change tracker before falling back to a DB query.
+            var thesisProject = db.ChangeTracker.Entries<Project>()
+                .Select(e => e.Entity)
+                .FirstOrDefault(p => p.Slug == "satellite-pesticide-detection")
+                ?? await db.Projects.FirstOrDefaultAsync(p => p.Slug == "satellite-pesticide-detection");
+
+            db.BlogPosts.Add(new BlogPost
+            {
+                Slug = "masters-thesis-satellite-pesticide-detection",
+                Title = "My Master's Thesis: Satellite-Based Detection of Pesticide Overuse",
+                Excerpt = "A summary of my master's thesis on using Sentinel-2 satellite imagery to flag likely overuse of pre-harvest desiccant on Danish potato fields, for a case brought by the Danish Environmental Protection Agency.",
+                // DRAFT article body for Oskar to review/expand before publishing — built from the
+                // verified Purpose/EngineeringNotes fields already in the Project seed above.
+                // Contribution details are still a TODO there too, so this draft stays general
+                // about "we"/the project rather than claiming specific individual work.
+                Body = """
+                    <p>
+                        For my master's thesis, I worked on a case brought by the Danish
+                        Environmental Protection Agency (Miljøstyrelsen): detecting when farmers
+                        were applying excessive pre-harvest desiccant to potato crops. The idea is
+                        that an unusually steep drop in a field's vegetation index during the
+                        desiccation window can indicate overuse, and that drop is visible from
+                        space.
+                    </p>
+                    <p>
+                        The project pulled and processed Sentinel-2 satellite imagery via its API,
+                        computing vegetation indices across the desiccation period for individual
+                        fields. Data processing was structured as a pipeline using RabbitMQ for
+                        messaging and Docker for containerization, with results stored in MySQL.
+                    </p>
+                    <p>
+                        <em>
+                            This is a draft summary — a fuller write-up of the specific engineering
+                            decisions, results, and my individual contribution is still to come.
+                        </em>
+                    </p>
+                    """,
+                // TODO: replace with the actual thesis submission/defense date.
+                PublishedOn = new DateOnly(2025, 6, 15),
+                RelatedProject = thesisProject,
+                Tags =
+                [
+                    new BlogPostTag { Name = "GIS", SortOrder = 1 },
+                    new BlogPostTag { Name = "Sentinel-2 API", SortOrder = 2 },
+                    new BlogPostTag { Name = "MySQL", SortOrder = 3 },
+                    new BlogPostTag { Name = "RabbitMQ", SortOrder = 4 },
+                    new BlogPostTag { Name = "Docker", SortOrder = 5 },
+                ]
+            });
         }
 
         await db.SaveChangesAsync();

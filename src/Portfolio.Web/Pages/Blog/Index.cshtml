@@ -1,0 +1,31 @@
+@page
+@model Portfolio.Web.Pages.Blog.IndexModel
+@{
+    ViewData["Title"] = "Blog";
+}
+
+<section id="blog">
+    <div class="section-inner wide">
+        <h1>Blog</h1>
+        <p class="lede">Articles about the projects I've built, and the engineering decisions behind them.</p>
+        <div class="blog-list">
+            @foreach (var post in Model.Posts)
+            {
+                <article class="blog-card">
+                    <h2><a asp-page="/Blog/Post" asp-route-slug="@post.Slug">@post.Title</a></h2>
+                    <p class="summary">@post.Excerpt</p>
+                    <ul class="tag-list">
+                        @foreach (var tag in post.Tags)
+                        {
+                            <li>@tag.Name</li>
+                        }
+                    </ul>
+                    <div class="blog-card__footer">
+                        <span class="blog-card__date">@post.PublishedOn.ToString("MMMM d, yyyy")</span>
+                        <a class="blog-card__readmore" asp-page="/Blog/Post" asp-route-slug="@post.Slug">Read more &rarr;</a>
+                    </div>
+                </article>
+            }
+        </div>
+    </div>
+</section>

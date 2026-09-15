@@ -9,6 +9,8 @@ public class PortfolioDbContext(DbContextOptions<PortfolioDbContext> options) : 
     public DbSet<ProjectTechnology> ProjectTechnologies => Set<ProjectTechnology>();
     public DbSet<SkillCategory> SkillCategories => Set<SkillCategory>();
     public DbSet<Skill> Skills => Set<Skill>();
+    public DbSet<BlogPost> BlogPosts => Set<BlogPost>();
+    public DbSet<BlogPostTag> BlogPostTags => Set<BlogPostTag>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -27,5 +29,21 @@ public class PortfolioDbContext(DbContextOptions<PortfolioDbContext> options) : 
             .WithOne(s => s.SkillCategory)
             .HasForeignKey(s => s.SkillCategoryId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<BlogPost>()
+            .HasIndex(p => p.Slug)
+            .IsUnique();
+
+        modelBuilder.Entity<BlogPost>()
+            .HasMany(p => p.Tags)
+            .WithOne(t => t.BlogPost)
+            .HasForeignKey(t => t.BlogPostId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<BlogPost>()
+            .HasOne(p => p.RelatedProject)
+            .WithMany()
+            .HasForeignKey(p => p.RelatedProjectId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }
