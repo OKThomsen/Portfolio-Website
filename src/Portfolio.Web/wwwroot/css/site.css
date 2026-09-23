@@ -668,6 +668,20 @@ section > .section-inner.wide {
   margin-bottom: 0;
 }
 
+.blog-post__body h2 {
+  font-size: 1.25rem;
+  margin: 2.25rem 0 0.75rem;
+}
+
+.blog-post__body ul {
+  margin: 0 0 1.25rem;
+  padding-left: 1.25rem;
+}
+
+.blog-post__body li {
+  margin-bottom: 0.4rem;
+}
+
 #blog-post .about-card {
   margin-top: 2.5rem;
   max-width: var(--content-width);
