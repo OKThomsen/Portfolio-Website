@@ -218,6 +218,71 @@ public static class SeedData
             });
         }
 
+        if (!existingPostSlugs.Contains("building-this-portfolio-website"))
+        {
+            db.BlogPosts.Add(new BlogPost
+            {
+                Slug = "building-this-portfolio-website",
+                Title = "Building This Portfolio Website in ASP.NET Core",
+                Excerpt = "Why this site is a server-rendered ASP.NET Core application backed by EF Core and SQL Server rather than a static page or JavaScript framework, and how it is put together.",
+                // DRAFT article body for Oskar to review/expand — built only from what the
+                // repository itself shows (stack, data model, startup flow), no invented results.
+                Body = """
+                    <p>
+                        A portfolio site could be a single static HTML page. I chose to build this
+                        one as a server-rendered ASP.NET Core application instead, because the
+                        roles I am applying for work with C#, .NET, SQL Server and Azure. Rather
+                        than only listing those technologies, I wanted the portfolio itself to be a
+                        project built with them.
+                    </p>
+                    <h2>Stack</h2>
+                    <ul>
+                        <li>ASP.NET Core 10 with Razor Pages, so every page is rendered on the server and there is no SPA framework</li>
+                        <li>Entity Framework Core 10 as the data layer</li>
+                        <li>SQL Server 2022, run locally in a Docker container via Docker Compose</li>
+                    </ul>
+                    <h2>Content as data</h2>
+                    <p>
+                        Projects, skills and blog posts, including this one, are modeled as EF Core
+                        entities and stored in SQL Server rather than hardcoded in the markup. Each
+                        project has its technologies as child rows, skills are grouped into
+                        categories, and a blog post can optionally reference a project, which is
+                        how the "Related project" box below is filled in. Presentation-only
+                        concerns, like which icon belongs to which skill, are kept in the page code
+                        rather than in the database.
+                    </p>
+                    <h2>Startup, migrations and seeding</h2>
+                    <p>
+                        On startup the application applies any pending EF Core migrations and then
+                        runs an idempotent seed step, so a fresh database is created and populated
+                        without any manual commands. Blog posts are seeded per slug, which means a
+                        new post added to the seed reaches a database that already contains the
+                        earlier ones, without duplicating or overwriting existing content.
+                    </p>
+                    <h2>What's next</h2>
+                    <p>
+                        Remaining work includes dedicated detail pages for each featured project,
+                        automated tests, and deployment to a server with HTTPS and a domain.
+                    </p>
+                    <p>
+                        <em>
+                            This is a draft, and I'll add more about the design decisions and what I
+                            learned building the site.
+                        </em>
+                    </p>
+                    """,
+                PublishedOn = new DateOnly(2026, 9, 23),
+                RelatedProject = await FindProjectAsync(db, "portfolio-website"),
+                Tags =
+                [
+                    new BlogPostTag { Name = "ASP.NET Core", SortOrder = 1 },
+                    new BlogPostTag { Name = "Entity Framework Core", SortOrder = 2 },
+                    new BlogPostTag { Name = "SQL Server", SortOrder = 3 },
+                    new BlogPostTag { Name = "Docker", SortOrder = 4 },
+                ]
+            });
+        }
+
         await db.SaveChangesAsync();
     }
 
