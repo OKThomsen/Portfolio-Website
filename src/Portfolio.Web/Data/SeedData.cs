@@ -167,15 +167,12 @@ public static class SeedData
             );
         }
 
-        if (!db.BlogPosts.Any())
-        {
-            // The Projects block above may have just added this entity in-memory without
-            // saving yet, so check the change tracker before falling back to a DB query.
-            var thesisProject = db.ChangeTracker.Entries<Project>()
-                .Select(e => e.Entity)
-                .FirstOrDefault(p => p.Slug == "satellite-pesticide-detection")
-                ?? await db.Projects.FirstOrDefaultAsync(p => p.Slug == "satellite-pesticide-detection");
+        // Blog posts are seeded per slug rather than "only if the table is empty", so posts
+        // added here later still reach databases that already contain the earlier ones.
+        var existingPostSlugs = await db.BlogPosts.Select(p => p.Slug).ToListAsync();
 
+        if (!existingPostSlugs.Contains("masters-thesis-satellite-pesticide-detection"))
+        {
             db.BlogPosts.Add(new BlogPost
             {
                 Slug = "masters-thesis-satellite-pesticide-detection",
@@ -209,7 +206,7 @@ public static class SeedData
                     """,
                 // TODO: replace with the actual thesis submission/defense date.
                 PublishedOn = new DateOnly(2025, 6, 15),
-                RelatedProject = thesisProject,
+                RelatedProject = await FindProjectAsync(db, "satellite-pesticide-detection"),
                 Tags =
                 [
                     new BlogPostTag { Name = "GIS", SortOrder = 1 },
@@ -223,4 +220,12 @@ public static class SeedData
 
         await db.SaveChangesAsync();
     }
+
+    // The Projects block above may have just added the entity in-memory without saving
+    // yet, so check the change tracker before falling back to a DB query.
+    private static async Task<Project?> FindProjectAsync(PortfolioDbContext db, string slug) =>
+        db.ChangeTracker.Entries<Project>()
+            .Select(e => e.Entity)
+            .FirstOrDefault(p => p.Slug == slug)
+        ?? await db.Projects.FirstOrDefaultAsync(p => p.Slug == slug);
 }
