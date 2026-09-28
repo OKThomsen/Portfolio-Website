@@ -473,17 +473,23 @@ section:last-of-type {
 }
 
 /* Projects */
+/* Two columns filling the container; cards in a row share a height, and
+   each card's links sit on its bottom edge. */
 .project-list {
-  display: flex;
-  flex-direction: column;
-  gap: 2.5rem;
-  /* Cards stay at a readable width; left-aligned (not centered) so their edge
-     lines up with the section heading and the wider skills grid above. */
-  max-width: 60rem;
-  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.75rem;
+}
+
+@media (max-width: 52rem) {
+  .project-list {
+    grid-template-columns: 1fr;
+  }
 }
 
 .project-card {
+  display: flex;
+  flex-direction: column;
   border: 1px solid var(--color-border);
   border-radius: 6px;
   padding: 1.75rem;
@@ -498,6 +504,7 @@ section:last-of-type {
 .project-card p.summary {
   color: var(--color-text-muted);
   margin: 0 0 1rem;
+  flex-grow: 1;
 }
 
 .tech-list {
