@@ -131,9 +131,10 @@ content (about copy, education cards, contact cards) is hardcoded in the
   edge sideways. When adding a section, use `.section-inner` and don't give
   it its own max-width.
 - **Section headers:** every section (except the hero) opens with
-  `<header class="section-header">` containing an `.eyebrow` label, the
-  `h1`/`h2` title (all titles share `--font-size-title`), and an optional
-  `.lede` intro. Headings are left-aligned; nothing is text-centered.
+  `<header class="section-header">` containing the `h1`/`h2` title (all
+  titles share `--font-size-title`) and an optional `.lede` intro. Only the
+  hero has an `.eyebrow` label above its title. Headings are left-aligned;
+  nothing is text-centered.
 - **Card grids:** Featured Projects and Education use a 2-column grid of
   bordered surface cards (1 column below 52rem). Contact uses the same card
   style in an auto-fit row.

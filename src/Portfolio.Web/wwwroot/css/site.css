@@ -237,15 +237,11 @@ section:last-of-type {
   margin: 0 auto;
 }
 
-/* Shared section header: eyebrow label, title, optional one-line intro —
-   all left-aligned on the container edge, with the same gap to the content
-   below on every section. */
+/* Shared section header: title plus optional one-line intro, left-aligned
+   on the container edge, with the same gap to the content below on every
+   section. */
 .section-header {
   margin-bottom: 2.5rem;
-}
-
-.section-header .eyebrow {
-  margin: 0 0 0.5rem;
 }
 
 .section-header h1,
