@@ -116,11 +116,31 @@ view. There is no caching, view-model or mapping layer:
 - `Blog/PostModel` loads one post by slug with tags and related project.
 
 `About` and `Contact` are static Razor Pages with empty page models. Their
-content (about copy, education entries, contact links) is hardcoded in the
+content (about copy, education cards, contact cards) is hardcoded in the
 `.cshtml` files, not taken from the database.
 
 ## Presentation notes
 
+- **Layout rule — one shared left edge:** the header nav, every section and
+  the footer use the same container (`--container`, 72rem, plus `--gutter`
+  on each side), so all content starts on one vertical line at every
+  viewport width. There are only two widths inside it: full container width
+  for grids and cards, and `--reading-width` (42rem) for long-form text —
+  which stays anchored to the left edge, never centered. `html` sets
+  `scrollbar-gutter: stable` so pages without a scrollbar don't shift the
+  edge sideways. When adding a section, use `.section-inner` and don't give
+  it its own max-width.
+- **Section headers:** every section (except the hero) opens with
+  `<header class="section-header">` containing an `.eyebrow` label, the
+  `h1`/`h2` title (all titles share `--font-size-title`), and an optional
+  `.lede` intro. Headings are left-aligned; nothing is text-centered.
+- **Card grids:** Featured Projects and Education use a 2-column grid of
+  bordered surface cards (1 column below 52rem). Contact uses the same card
+  style in an auto-fit row.
+- **Full-height pages:** Home and About use `body.full-sections` (each
+  section is one screen tall, content vertically centered). Contact uses
+  `body.fill-viewport` instead: the single section fills the space between
+  header and footer, so the footer sits at the bottom of the window.
 - **Skill icons:** each skill renders as an icon tile (brand SVG + label, with
   a hover lift). Icons are vendored SVGs in `wwwroot/img/tech/<slug>.svg`. The
   skill-name → slug mapping lives in `IndexModel.IconBySkill`, since it's a
