@@ -10,9 +10,20 @@
   --color-header-text-muted: rgba(243, 236, 221, 0.72);
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-  --content-width: 42rem;
+  /* Layout: the nav, every section and the footer share one container, so
+     all content starts on the same left edge. Long-form text additionally
+     caps at --reading-width but stays anchored to that edge. */
+  --container: 72rem;
+  --gutter: 1.5rem;
+  --reading-width: 42rem;
   --space-section: clamp(4.5rem, 10vw, 8rem);
   --footer-height: 0px;
+}
+
+@media (max-width: 40rem) {
+  :root {
+    --gutter: 1.25rem;
+  }
 }
 
 * {
@@ -21,6 +32,9 @@
 
 html {
   scroll-behavior: smooth;
+  /* Always reserve the scrollbar's space so short pages (no scrollbar) don't
+     shift the centered container sideways relative to long ones. */
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -75,9 +89,9 @@ h1, h2, h3 {
 }
 
 .site-nav {
-  max-width: 60rem;
+  max-width: calc(var(--container) + 2 * var(--gutter));
   margin: 0 auto;
-  padding: 1rem 1.5rem;
+  padding: 1rem var(--gutter);
   display: flex;
   align-items: center;
   gap: 1.5rem;
@@ -129,7 +143,7 @@ h1, h2, h3 {
 
 /* Sections */
 section {
-  padding: var(--space-section) 1.5rem;
+  padding: var(--space-section) var(--gutter);
   border-bottom: 1px solid var(--color-border);
   scroll-margin-top: 4.5rem;
 }
@@ -211,24 +225,19 @@ section:last-of-type {
 }
 
 .section-inner {
-  /* width:100% so the box always fills --content-width and its left edge
+  /* width:100% so the box always fills the container and its left edge
      lines up across sections. Without it, a flex-column section centers this
      via the auto margins at its shrink-to-fit content width, so a section
-     with short content (e.g. Education) ends up narrower and visibly indented
-     relative to text-heavy sections like About. */
+     with short content ends up narrower and visibly indented. */
   width: 100%;
-  max-width: var(--content-width);
+  max-width: var(--container);
   margin: 0 auto;
 }
 
-section > .section-inner.wide {
-  max-width: 72rem;
-}
-
-/* Skills needs more room than the shared "wide" cap: at the widened tile
+/* Skills needs more room than the shared container: at the widened tile
    size (see .skill-grid) below, 5 category columns need ~83rem to stay on
-   one row like the other "wide" sections' content does. */
-#skills > .section-inner.wide {
+   one row. */
+#skills > .section-inner {
   max-width: 88rem;
 }
 
@@ -657,7 +666,7 @@ section > .section-inner.wide {
 
 .blog-post__body {
   color: var(--color-text);
-  max-width: var(--content-width);
+  max-width: var(--reading-width);
 }
 
 .blog-post__body p {
@@ -684,14 +693,14 @@ section > .section-inner.wide {
 
 #blog-post .about-card {
   margin-top: 2.5rem;
-  max-width: var(--content-width);
+  max-width: var(--reading-width);
 }
 
 /* Footer */
 .site-footer {
-  max-width: 72rem;
+  max-width: calc(var(--container) + 2 * var(--gutter));
   margin: 0 auto;
-  padding: 3rem 1.5rem 1.75rem;
+  padding: 3rem var(--gutter) 1.75rem;
   border-top: 1px solid var(--color-border);
   color: var(--color-text-muted);
   font-size: 0.85rem;
@@ -797,11 +806,6 @@ section > .section-inner.wide {
 }
 
 @media (max-width: 40rem) {
-  .site-footer {
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
-  }
-
   .site-footer__grid {
     grid-template-columns: 1fr;
     gap: 2rem;
@@ -810,7 +814,7 @@ section > .section-inner.wide {
 
 @media (max-width: 40rem) {
   section {
-    padding: 2.5rem 1.25rem;
+    padding: 2.5rem var(--gutter);
   }
 
   /* Don't force a full screen on small viewports — tall stacked content
