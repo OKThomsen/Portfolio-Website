@@ -580,23 +580,69 @@ section:last-of-type {
 }
 
 /* Contact */
-#contact .contact-links {
+.contact-methods {
   list-style: none;
+  margin: 0;
   padding: 0;
-  margin: 1rem 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1.25rem;
+}
+
+.contact-card {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
-  font-size: 1rem;
-}
-
-#contact .contact-links a {
+  gap: 0.4rem;
+  height: 100%;
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
   text-decoration: none;
-  border-bottom: 1px solid var(--color-border);
+  transition: border-color 0.18s ease;
 }
 
-#contact .contact-links a:hover {
+.contact-card:hover {
   border-color: var(--color-accent);
+}
+
+.contact-card .eyebrow {
+  margin: 0;
+}
+
+.contact-card__value {
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+
+/* Single-section pages (Contact): the footer sits at the bottom of the
+   window, and the section fills the space above it with its content
+   vertically centered, like the full-height sections on Home and About. */
+body.fill-viewport {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+body.fill-viewport #main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+body.fill-viewport #main > section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* Content is centered in the available space, so the tall default
+     section padding would only push the footer below the fold. */
+  padding-block: clamp(3rem, 6vw, 4.5rem);
+}
+
+/* As a flex item the footer would otherwise shrink to its content width. */
+body.fill-viewport .site-footer {
+  width: 100%;
 }
 
 /* Blog */

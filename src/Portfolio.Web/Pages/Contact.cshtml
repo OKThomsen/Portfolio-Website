@@ -2,6 +2,7 @@
 @model ContactModel
 @{
     ViewData["Title"] = "Contact";
+    ViewData["BodyClass"] = "fill-viewport";
 }
 
 <section id="contact">
@@ -9,11 +10,33 @@
         <header class="section-header">
             <p class="eyebrow">Contact</p>
             <h1>Get in Touch</h1>
+            <p class="lede">I'm open to software engineering roles &mdash; backend and cloud work with C#/.NET, SQL, and Azure.</p>
         </header>
-        <ul class="contact-links">
-            <li><a href="https://www.linkedin.com/in/oskar-kj%C3%A6r-thomsen-4880b7244/" target="_blank" rel="noopener">LinkedIn</a></li>
-            <li><a href="mailto:oskar@kjaer-thomsen.dk">E-mail : oskar@kjaer-thomsen.dk</a></li>
-            <li><a href="tel:+4528605415">Phone : +45 28 60 54 15</a></li>
+        <ul class="contact-methods">
+            <li>
+                <a class="contact-card" href="mailto:oskar@kjaer-thomsen.dk">
+                    <span class="eyebrow">E-mail</span>
+                    <span class="contact-card__value">oskar@kjaer-thomsen.dk</span>
+                </a>
+            </li>
+            <li>
+                <a class="contact-card" href="tel:+4528605415">
+                    <span class="eyebrow">Phone</span>
+                    <span class="contact-card__value">+45 28 60 54 15</span>
+                </a>
+            </li>
+            <li>
+                <a class="contact-card" href="https://www.linkedin.com/in/oskar-kj%C3%A6r-thomsen-4880b7244/" target="_blank" rel="noopener">
+                    <span class="eyebrow">LinkedIn</span>
+                    <span class="contact-card__value">Oskar Kjær Thomsen</span>
+                </a>
+            </li>
+            <li>
+                <a class="contact-card" href="https://github.com/okthomsen" target="_blank" rel="noopener">
+                    <span class="eyebrow">GitHub</span>
+                    <span class="contact-card__value">okthomsen</span>
+                </a>
+            </li>
         </ul>
     </div>
 </section>
