@@ -210,3 +210,4 @@ To add a migration after changing a model:
 - No automated tests exist yet.
 - Not yet deployed. No Dockerfile for the app, no CI/CD pipeline and no
   hosting setup.
+  -Revisit hero text
