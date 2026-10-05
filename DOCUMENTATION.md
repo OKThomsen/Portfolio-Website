@@ -160,6 +160,18 @@ content (about copy, education cards, contact cards) is hardcoded in the
   through the UI or come from another source, they must be sanitized first.
   `.blog-post__body` styles `h2` and `ul` for longer articles.
 
+## Content notes
+
+- **Hero copy names no technologies.** It positions Oskar as a full-stack
+  developer and points to the kinds of work behind the projects (embedded
+  devices, web applications, distributed systems for the TV 2 and Danish EPA
+  cases). Specific technologies are left to the Technical Skills section and
+  the project cards, so they aren't repeated. Every claim in the hero should
+  map to a seeded project.
+- **Target stack vs. experience.** ASP.NET Core, EF Core and Azure are the
+  stack Oskar is targeting, and this site is his first project in it. Copy
+  should not present them as established expertise.
+
 ## Configuration & secrets
 
 - `ConnectionStrings:PortfolioDb` lives in `appsettings.Development.json`,
@@ -174,7 +186,10 @@ content (about copy, education cards, contact cards) is hardcoded in the
   connection string should come from environment variables or a secret store,
   not from a committed file.
 - `.gitignore` ignores all `*.md` files except `README.md` and
-  `DOCUMENTATION.md`, so internal working notes stay out of the repo.
+  `DOCUMENTATION.md`, so internal working notes (including `CLAUDE.md`) stay
+  out of the repo.
+- The root-level `/CV.pdf` (the personal source copy) is gitignored. The
+  served copy at `wwwroot/files/CV.pdf` is tracked.
 
 ## Running locally
 
@@ -205,6 +220,9 @@ To add a migration after changing a model:
   page exists yet.
 - `wwwroot/files/CV.pdf` is served, but no page links to it yet (`CLAUDE.md`
   wants a CV link in the hero).
+- The footer blurb in `_Layout.cshtml` still reads "focused on backend
+  systems and the Microsoft stack — ASP.NET Core, EF Core, and Azure". That
+  conflicts with both points under "Content notes" and should be reworded.
 - Content edits to existing skills/projects in `SeedData.cs` don't reach an
   already-seeded database (see "Request flow").
 - No automated tests exist yet.
