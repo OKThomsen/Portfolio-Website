@@ -162,7 +162,7 @@ content (about copy, education cards, contact cards) is hardcoded in the
 
 ## Content notes
 
-- **Hero copy names no technologies.** It positions Oskar as a full-stack
+- **Hero and footer copy name no technologies.** It positions Oskar as a full-stack
   developer and points to the kinds of work behind the projects (embedded
   devices, web applications, distributed systems for the TV 2 and Danish EPA
   cases). Specific technologies are left to the Technical Skills section and
@@ -220,9 +220,6 @@ To add a migration after changing a model:
   page exists yet.
 - `wwwroot/files/CV.pdf` is served, but no page links to it yet (`CLAUDE.md`
   wants a CV link in the hero).
-- The footer blurb in `_Layout.cshtml` still reads "focused on backend
-  systems and the Microsoft stack — ASP.NET Core, EF Core, and Azure". That
-  conflicts with both points under "Content notes" and should be reworded.
 - Content edits to existing skills/projects in `SeedData.cs` don't reach an
   already-seeded database (see "Request flow").
 - No automated tests exist yet.
