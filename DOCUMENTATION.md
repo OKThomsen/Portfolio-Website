@@ -97,13 +97,18 @@ startup it runs `db.Database.MigrateAsync()` then `SeedData.SeedAsync(db)`.
 
 Seeding is safe to run repeatedly and never overwrites existing rows:
 
-- Skill categories and projects are only inserted if their table is empty.
-  Editing them in `SeedData.cs` will **not** update an existing database.
-- Blog posts are seeded **per slug**: each post is inserted only if its slug
-  isn't already in the database. A new post added to `SeedData.cs` therefore
-  reaches databases that already hold the earlier posts. `FindProjectAsync`
-  resolves `RelatedProject` from the change tracker first, because on a fresh
-  database the project may have been added in the same run but not saved yet.
+- Everything is seeded **per key**: a skill category by name, a skill by name
+  within its category, a project or blog post by slug. An item is inserted
+  only if its key isn't already in the database, so a new skill, project or
+  post added to `SeedData.cs` reaches databases seeded earlier.
+- Existing rows are never updated. Editing an existing item in `SeedData.cs`
+  will **not** change it in a database that already has it. New skills go at
+  the end of their category so old and new databases show the same order, and
+  a new project that should lead the list uses a lower `SortOrder` (the pool
+  tournament project uses 0) instead of renumbering the others.
+- `FindProjectAsync` resolves a post's `RelatedProject` from the change
+  tracker first, because the project may have been added in the same run but
+  not saved yet.
 
 The page models query EF Core directly and pass the entity types to the
 view. There is no caching, view-model or mapping layer:
@@ -210,7 +215,7 @@ To add a migration after changing a model:
 
 - `Project.Contribution` has two `TODO` placeholders (thesis project, TV2
   project), pending Oskar's wording for his individual contribution.
-- Both blog posts are **drafts**. The bodies were built only from verified
+- All three blog posts are **drafts**. The bodies were built only from verified
   project data and repo facts, and still need Oskar's own write-up. The thesis
   post's `PublishedOn` (2025-06-15) is a placeholder for the real
   submission/defense date.
@@ -220,8 +225,8 @@ To add a migration after changing a model:
   page exists yet.
 - `wwwroot/files/CV.pdf` is served, but no page links to it yet (`CLAUDE.md`
   wants a CV link in the hero).
-- Content edits to existing skills/projects in `SeedData.cs` don't reach an
-  already-seeded database (see "Request flow").
+- Edits to existing skills/projects/posts in `SeedData.cs` don't reach an
+  already-seeded database; only new items do (see "Request flow").
 - No automated tests exist yet.
 - Not yet deployed. No Dockerfile for the app, no CI/CD pipeline and no
   hosting setup.
