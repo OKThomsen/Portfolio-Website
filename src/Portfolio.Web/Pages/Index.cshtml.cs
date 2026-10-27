@@ -10,6 +10,9 @@ public class IndexModel(PortfolioDbContext db) : PageModel
     public List<SkillCategory> SkillCategories { get; set; } = [];
     public List<Project> FeaturedProjects { get; set; } = [];
 
+    // Project id → slug of the newest blog post about that project.
+    public Dictionary<int, string> BlogPostSlugByProject { get; set; } = [];
+
     // Maps a skill name to an icon file in wwwroot/img/tech (without extension).
     // Icon choice is presentation, so it lives here rather than in the database.
     // Names not present here render with a neutral placeholder glyph.
@@ -60,5 +63,15 @@ public class IndexModel(PortfolioDbContext db) : PageModel
             .Where(p => p.Featured)
             .OrderBy(p => p.SortOrder)
             .ToListAsync();
+
+        var posts = await db.BlogPosts
+            .Where(p => p.RelatedProjectId != null)
+            .OrderByDescending(p => p.PublishedOn)
+            .Select(p => new { ProjectId = p.RelatedProjectId!.Value, p.Slug })
+            .ToListAsync();
+        foreach (var post in posts)
+        {
+            BlogPostSlugByProject.TryAdd(post.ProjectId, post.Slug);
+        }
     }
 }

@@ -113,9 +113,10 @@ Seeding is safe to run repeatedly and never overwrites existing rows:
 The page models query EF Core directly and pass the entity types to the
 view. There is no caching, view-model or mapping layer:
 
-- `IndexModel.OnGetAsync()` loads all skill categories (with skills, ordered)
-  and all `Featured` projects (with technologies, ordered) in two independent
-  queries.
+- `IndexModel.OnGetAsync()` loads all skill categories (with skills, ordered),
+  all `Featured` projects (with technologies, ordered), and the slug of the
+  newest blog post per project, in three independent queries. A project card
+  shows a "Blog post" link next to "Source code" when it has a post.
 - `Blog/IndexModel` loads all posts with tags, ordered by `PublishedOn`
   descending.
 - `Blog/PostModel` loads one post by slug with tags and related project.

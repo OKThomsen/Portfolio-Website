@@ -92,6 +92,10 @@
                         {
                             <a href="@project.RepositoryUrl" target="_blank" rel="noopener">Source code</a>
                         }
+                        @if (Model.BlogPostSlugByProject.TryGetValue(project.Id, out var postSlug))
+                        {
+                            <a asp-page="/Blog/Post" asp-route-slug="@postSlug">Blog post</a>
+                        }
                         @if (!string.IsNullOrEmpty(project.DemoUrl))
                         {
                             <a href="@project.DemoUrl" target="_blank" rel="noopener">Live demo</a>
