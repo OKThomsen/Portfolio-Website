@@ -1,0 +1,23 @@
+# Production additions on top of docker-compose.yml: nothing is published on the host, and the
+# app joins the shared `web` network, where the shared Caddy (caddy/) reaches it as
+# `portfolio-app`. On the server, put this in .env so a plain `docker compose …` uses both files:
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.prod.yml
+services:
+  sqlserver:
+    # Only reachable by the app, over the Docker network.
+    ports: !reset []
+    environment:
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in .env}
+
+  app:
+    # Only reachable through Caddy.
+    ports: !reset []
+    networks:
+      default:
+      web:
+        # A name of its own on the shared network: the pool app's service is also called `app`.
+        aliases: [portfolio-app]
+
+networks:
+  web:
+    external: true

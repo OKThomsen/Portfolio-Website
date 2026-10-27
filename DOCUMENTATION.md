@@ -241,6 +241,90 @@ To add a migration after changing a model:
 `dotnet ef migrations add <Name>` from `src/Portfolio.Web` (requires the
 `dotnet-ef` global tool).
 
+## Production (oskar.kjaer-thomsen.dk)
+
+The site runs on the same Linux VM as the pool tournament platform
+(`turneringsportal.kjaer-thomsen.dk`), from a clone of this repo's
+`production` branch in `~/Projects/Portfolio-website`, next to
+`~/Projects/pool-tournament-app`.
+
+**One Caddy for both sites.** Only one program can listen on ports 80 and 443,
+so a single Caddy sits in front of both apps. It lives in `caddy/` as its own
+Compose project (`name: caddy`), so rebuilding either app never touches it:
+
+- `caddy/Caddyfile` has one block per site and gets each HTTPS certificate
+  from Let's Encrypt by itself.
+- Caddy and the apps meet on an external Docker network called `web`, created
+  once with `docker network create web`.
+- Both apps' Compose services are called `app`, so on `web` each gets an alias
+  of its own: `portfolio-app` (this repo's `docker-compose.prod.yml`) and
+  `pool-app` (the pool repo's `docker-compose.prod.yml`, below).
+
+**This site's production override** (`docker-compose.prod.yml`, on top of
+`docker-compose.yml`): no ports are published on the host, the app joins `web`
+as `portfolio-app`, and `MSSQL_SA_PASSWORD` must be set.
+
+**Backups:** none needed. All content comes from `SeedData.cs` and is synced
+into the database on every startup, so an empty database is rebuilt from the
+repo at the next start.
+
+**What the pool app needs** (in `pool-tournament-app/docker-compose.prod.yml`):
+remove its `caddy` service and its `caddy-data`/`caddy-config` volumes, put its
+`app` on the `web` network as `pool-app`, and declare `web` as external:
+
+```yaml
+services:
+  app:
+    ports: !reset []
+    environment:
+      COOKIE_SECURE: 'true'
+      TRUST_PROXY: uniquelocal
+    networks:
+      default:
+      web:
+        aliases: [pool-app]
+  # db and backup stay as they are
+networks:
+  web:
+    external: true
+```
+
+Its own `Caddyfile` and the `DOMAIN` line in its `.env` are then no longer used.
+`TRUST_PROXY: uniquelocal` keeps working, because the `web` network is a
+private address range too.
+
+**First setup / switch-over** (the pool site is down for about a minute in
+step 4, until the shared Caddy has its certificates):
+
+1. DNS: an A record for `oskar.kjaer-thomsen.dk` pointing at the server's
+   public IP (the same as `turneringsportal`).
+2. `docker network create web`
+3. In `~/Projects/Portfolio-website` on the `production` branch:
+   ```sh
+   cat > .env <<EOF
+   COMPOSE_FILE=docker-compose.yml:docker-compose.prod.yml
+   MSSQL_SA_PASSWORD=$(openssl rand -hex 16)Aa1!
+   EOF
+   docker compose up -d --build
+   ```
+   (SQL Server needs upper case, lower case, digits and a symbol; `rand -hex`
+   gives only the first two kinds, hence the suffix. SQL Server only reads the
+   password when it creates its data, like Postgres.)
+4. In `~/Projects/pool-tournament-app`, make the change above, then
+   `docker compose up -d --remove-orphans`. This stops the pool app's own
+   Caddy.
+5. In `~/Projects/Portfolio-website/caddy`: `docker compose up -d`, then
+   `docker compose logs -f caddy` until both certificates are obtained.
+
+**Updating this site:** `git pull && docker compose up -d --build` in
+`~/Projects/Portfolio-website`. Migrations and the content sync run on
+startup. After editing `caddy/Caddyfile`:
+`docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile` in
+`caddy/`.
+
+**Branches:** `main` is where work happens; `production` is what the server
+runs. Merge `main` into `production` to deploy.
+
 ## Current gaps / known TODOs
 
 - `Project.Contribution` has a `TODO` placeholder on the TV2 project, pending
@@ -254,5 +338,5 @@ To add a migration after changing a model:
 - `wwwroot/files/CV.pdf` is served, but no page links to it yet (`CLAUDE.md`
   wants a CV link in the hero).
 - No automated tests exist yet.
-- Not yet deployed. The app is containerized, but there is no production
-  setup yet (reverse proxy with HTTPS, backups) and no CI/CD pipeline.
+- No CI/CD pipeline: deploying is a manual `git pull` and rebuild on the
+  server (see "Production").
