@@ -167,12 +167,13 @@ content (about copy, education cards, contact cards) is hardcoded in the
 
 ## Content notes
 
-- **Hero and footer copy name no technologies.** It positions Oskar as a full-stack
-  developer and points to the kinds of work behind the projects (embedded
-  devices, web applications, distributed systems for the TV 2 and Danish EPA
-  cases). Specific technologies are left to the Technical Skills section and
-  the project cards, so they aren't repeated. Every claim in the hero should
-  map to a seeded project.
+- **Hero and footer copy name no technologies.** The hero positions Oskar as a
+  software engineer who builds complete systems, and leads with the pool
+  tournament platform (in production), then the master's thesis for the Danish
+  EPA case. The TV 2 bachelor project is deliberately left out of the hero.
+  Specific technologies are left to the Technical Skills section and the
+  project cards, so they aren't repeated. Every claim in the hero should map
+  to a seeded project.
 - **Target stack vs. experience.** ASP.NET Core, EF Core and Azure are the
   stack Oskar is targeting, and this site is his first project in it. Copy
   should not present them as established expertise.
