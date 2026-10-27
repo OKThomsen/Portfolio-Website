@@ -214,50 +214,77 @@ public static class SeedData
                 Slug = "building-this-portfolio-website",
                 Title = "Building This Portfolio Website in ASP.NET Core",
                 Excerpt = "Why this site is a server-rendered ASP.NET Core application backed by EF Core and SQL Server rather than a static page or JavaScript framework, and how it is put together.",
-                // DRAFT article body for Oskar to review/expand — built only from what the
-                // repository itself shows (stack, data model, startup flow), no invented results.
+                // Built from what the repository shows (code, config, DOCUMENTATION.md, git history).
                 Body = """
                     <p>
-                        A portfolio site could be a single static HTML page. I chose to build this
-                        one as a server-rendered ASP.NET Core application instead, because the
-                        roles I am applying for work with C#, .NET, SQL Server and Azure. Rather
-                        than only listing those technologies, I wanted the portfolio itself to be a
-                        project built with them.
+                        A portfolio site could be a single static HTML page. I built this one as a
+                        server-rendered ASP.NET Core application instead. The roles I am applying
+                        for work with C#, .NET and SQL Server, and this site is my first project in
+                        that stack. Rather than only listing those technologies, I wanted the
+                        portfolio itself to be built with them.
                     </p>
                     <h2>Stack</h2>
                     <ul>
-                        <li>ASP.NET Core 10 with Razor Pages, so every page is rendered on the server and there is no SPA framework</li>
-                        <li>Entity Framework Core 10 as the data layer</li>
-                        <li>SQL Server 2022, run locally in a Docker container via Docker Compose</li>
+                        <li>ASP.NET Core 10 with Razor Pages: every page is rendered on the server, with no SPA framework</li>
+                        <li>Entity Framework Core 10 as the data layer, with schema changes as EF Core migrations</li>
+                        <li>SQL Server 2022, run locally in a Docker container with Docker Compose</li>
+                        <li>Plain CSS and a 48-line JavaScript file, with no frontend build step, npm packages or web fonts</li>
                     </ul>
+                    <p>
+                        The only NuGet packages are EF Core's SQL Server provider and its design-time
+                        tools. Everything else comes with ASP.NET Core.
+                    </p>
                     <h2>Content as data</h2>
                     <p>
-                        Projects, skills and blog posts, including this one, are modeled as EF Core
-                        entities and stored in SQL Server rather than hardcoded in the markup. Each
-                        project has its technologies as child rows, skills are grouped into
-                        categories, and a blog post can optionally reference a project, which is
-                        how the "Related project" box below is filled in. Presentation-only
-                        concerns, like which icon belongs to which skill, are kept in the page code
-                        rather than in the database.
+                        Projects, skills and blog posts, including this one, are EF Core entities
+                        stored in SQL Server rather than hardcoded in the markup. A project has its
+                        technologies as child rows, skills are grouped into categories, and a blog
+                        post can point to a project, which is how the "Related project" box below
+                        is filled in. Presentation concerns stay out of the database. For example,
+                        which icon belongs to which skill is a mapping in the page code.
+                    </p>
+                    <p>
+                        The related rows are loaded in the same query, so a page never makes one
+                        extra query per item, and the URL slugs of projects and posts have unique
+                        indexes.
                     </p>
                     <h2>Startup, migrations and seeding</h2>
                     <p>
-                        On startup the application applies any pending EF Core migrations and then
-                        runs an idempotent seed step, so a fresh database is created and populated
-                        without any manual commands. Blog posts are seeded per slug, which means a
-                        new post added to the seed reaches a database that already contains the
-                        earlier ones, without duplicating or overwriting existing content.
-                    </p>
-                    <h2>What's next</h2>
-                    <p>
-                        Remaining work includes dedicated detail pages for each featured project,
-                        automated tests, and deployment to a server with HTTPS and a domain.
+                        On startup the app applies any pending migrations and then seeds the
+                        content, so a new database is created and filled without any manual
+                        commands. Seeding works per key: a skill by its name within its category,
+                        and a project or post by its slug. A new item added to the seed reaches a
+                        database that already has the earlier ones, and nothing is duplicated.
                     </p>
                     <p>
-                        <em>
-                            This is a draft, and I'll add more about the design decisions and what I
-                            learned building the site.
-                        </em>
+                        Existing rows are never updated, which is a deliberate trade-off: the seed
+                        can never overwrite content in a database. The cost is that editing an
+                        existing post in the seed means removing it from the database first, so it
+                        gets seeded again.
+                    </p>
+                    <h2>Design</h2>
+                    <p>
+                        The look is meant to be minimal and quiet, so the projects carry the page.
+                        One layout rule does most of the work: the header, every section and the
+                        footer share one container, so all content starts on the same vertical
+                        line at every screen width. Long text, like this post, is held to a
+                        comfortable reading width but stays on that left edge.
+                    </p>
+                    <p>
+                        The one decorative element is a wave in the background. A small script
+                        uses an <code>IntersectionObserver</code> to note which section is in the
+                        middle of the screen, and CSS drifts, fades and tints the wave for that
+                        section. Transitions only switch on after the first paint, so the page
+                        doesn't flash on load. The skill icons are SVG files served with the
+                        site, so no third-party CDN is involved.
+                    </p>
+                    <h2>Blog posts</h2>
+                    <p>
+                        A post's body is stored as HTML and rendered as is. That is only safe
+                        because every post comes from the seed in the repository. If posts ever
+                        became editable in the browser, the HTML would have to be sanitized first.
+                        The figures and screenshots in the posts are plain image files with set
+                        dimensions and lazy loading, so they don't shift the page while it loads.
                     </p>
                     """,
                 PublishedOn = new DateOnly(2026, 9, 23),

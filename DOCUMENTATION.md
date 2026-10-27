@@ -213,11 +213,9 @@ To add a migration after changing a model:
 
 ## Current gaps / known TODOs
 
-- `Project.Contribution` has two `TODO` placeholders (thesis project, TV2
-  project), pending Oskar's wording for his individual contribution.
-- All three blog posts are **drafts**. The bodies were built only from verified
-  project data and repo facts, and still need Oskar's own write-up. The thesis
-  post's `PublishedOn` (2025-06-15) is a placeholder for the real
+- `Project.Contribution` has a `TODO` placeholder on the TV2 project, pending
+  Oskar's wording for his individual contribution.
+- The thesis post's `PublishedOn` (2025-06-15) is a placeholder for the real
   submission/defense date.
 - The thesis repository lives under a teammate's GitHub account
   (`anton4d`), and the TV2 repository is a fork of a teammate's original.
