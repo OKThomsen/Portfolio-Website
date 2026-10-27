@@ -1,6 +1,7 @@
 # Production additions on top of docker-compose.yml: nothing is published on the host, and the
-# app joins the shared `web` network, where the shared Caddy (caddy/) reaches it as
-# `portfolio-app`. On the server, put this in .env so a plain `docker compose …` uses both files:
+# app joins the shared `web` network, where the server's shared Caddy (~/Projects/caddy, see
+# DOCUMENTATION.md) reaches it as `portfolio-app`. On the server, put this in .env so a plain
+# `docker compose …` uses both files:
 #   COMPOSE_FILE=docker-compose.yml:docker-compose.prod.yml
 services:
   sqlserver:

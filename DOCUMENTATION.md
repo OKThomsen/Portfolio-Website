@@ -245,85 +245,113 @@ To add a migration after changing a model:
 
 The site runs on the same Linux VM as the pool tournament platform
 (`turneringsportal.kjaer-thomsen.dk`), from a clone of this repo's
-`production` branch in `~/Projects/Portfolio-website`, next to
-`~/Projects/pool-tournament-app`.
+`production` branch:
 
-**One Caddy for both sites.** Only one program can listen on ports 80 and 443,
-so a single Caddy sits in front of both apps. It lives in `caddy/` as its own
-Compose project (`name: caddy`), so rebuilding either app never touches it:
-
-- `caddy/Caddyfile` has one block per site and gets each HTTPS certificate
-  from Let's Encrypt by itself.
-- Caddy and the apps meet on an external Docker network called `web`, created
-  once with `docker network create web`.
-- Both apps' Compose services are called `app`, so on `web` each gets an alias
-  of its own: `portfolio-app` (this repo's `docker-compose.prod.yml`) and
-  `pool-app` (the pool repo's `docker-compose.prod.yml`, below).
+```
+~/Projects/
+├── caddy/                 the shared reverse proxy (not in any repo, see below)
+├── pool-tournament-app/   the pool app, its `production` branch
+└── Portfolio-Website/     this repo, `production` branch
+```
 
 **This site's production override** (`docker-compose.prod.yml`, on top of
-`docker-compose.yml`): no ports are published on the host, the app joins `web`
-as `portfolio-app`, and `MSSQL_SA_PASSWORD` must be set.
+`docker-compose.yml`): no ports are published on the host, the app joins the
+shared `web` network as `portfolio-app`, and `MSSQL_SA_PASSWORD` must be set.
+The server's `.env`:
+
+```sh
+COMPOSE_FILE=docker-compose.yml:docker-compose.prod.yml
+MSSQL_SA_PASSWORD=<random>
+```
+
+It was created with `MSSQL_SA_PASSWORD=$(openssl rand -hex 16)Aa1!`. SQL
+Server needs upper case, lower case, digits and a symbol, and `rand -hex` gives
+only lower case and digits, hence the suffix. Without a `.env`, SQL Server gets
+a blank password and keeps restarting. SQL Server only reads the password when
+it creates its data, so to change it, recreate the volume
+(`docker compose down -v`, then `up`), which is safe (see Backups).
 
 **Backups:** none needed. All content comes from `SeedData.cs` and is synced
 into the database on every startup, so an empty database is rebuilt from the
 repo at the next start.
 
-**What the pool app needs** (in `pool-tournament-app/docker-compose.prod.yml`):
-remove its `caddy` service and its `caddy-data`/`caddy-config` volumes, put its
-`app` on the `web` network as `pool-app`, and declare `web` as external:
-
-```yaml
-services:
-  app:
-    ports: !reset []
-    environment:
-      COOKIE_SECURE: 'true'
-      TRUST_PROXY: uniquelocal
-    networks:
-      default:
-      web:
-        aliases: [pool-app]
-  # db and backup stay as they are
-networks:
-  web:
-    external: true
-```
-
-Its own `Caddyfile` and the `DOMAIN` line in its `.env` are then no longer used.
-`TRUST_PROXY: uniquelocal` keeps working, because the `web` network is a
-private address range too.
-
-**First setup / switch-over** (the pool site is down for about a minute in
-step 4, until the shared Caddy has its certificates):
-
-1. DNS: an A record for `oskar.kjaer-thomsen.dk` pointing at the server's
-   public IP (the same as `turneringsportal`).
-2. `docker network create web`
-3. In `~/Projects/Portfolio-website` on the `production` branch:
-   ```sh
-   cat > .env <<EOF
-   COMPOSE_FILE=docker-compose.yml:docker-compose.prod.yml
-   MSSQL_SA_PASSWORD=$(openssl rand -hex 16)Aa1!
-   EOF
-   docker compose up -d --build
-   ```
-   (SQL Server needs upper case, lower case, digits and a symbol; `rand -hex`
-   gives only the first two kinds, hence the suffix. SQL Server only reads the
-   password when it creates its data, like Postgres.)
-4. In `~/Projects/pool-tournament-app`, make the change above, then
-   `docker compose up -d --remove-orphans`. This stops the pool app's own
-   Caddy.
-5. In `~/Projects/Portfolio-website/caddy`: `docker compose up -d`, then
-   `docker compose logs -f caddy` until both certificates are obtained.
-
 **Updating this site:** `git pull && docker compose up -d --build` in
-`~/Projects/Portfolio-website`. Migrations and the content sync run on
-startup. After editing `caddy/Caddyfile`:
-`docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile` in
-`caddy/`.
+`~/Projects/Portfolio-Website`. Migrations and the content sync run on
+startup.
 
 **Branches:** `main` is where work happens; `production` is what the server
 runs. Merge `main` into `production` to deploy.
+
+### The shared Caddy
+
+Only one program can listen on ports 80 and 443, so one Caddy sits in front of
+both sites. It lives on the server in `~/Projects/caddy`, outside both repos,
+as its own Compose project (`name: caddy`), so rebuilding either app never
+touches it.
+
+- It gets and renews each site's HTTPS certificate from Let's Encrypt by
+  itself, and redirects http to https.
+- Caddy and the apps meet on an external Docker network called `web`, created
+  once with `docker network create web`. Caddy won't start until it exists.
+- Both apps' Compose services are called `app`, so on `web` each has an alias
+  of its own: `portfolio-app` (this repo's `docker-compose.prod.yml`) and
+  `pool-app` (the pool repo's `docker-compose.prod.yml`).
+
+After editing its `Caddyfile`, in `~/Projects/caddy`:
+`docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile`.
+Logs: `docker compose logs -f caddy`.
+
+Its two files, to recreate it on a new server:
+
+`~/Projects/caddy/docker-compose.yml`:
+
+```yaml
+name: caddy
+
+services:
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
+
+volumes:
+  caddy-data:
+  caddy-config:
+```
+
+`~/Projects/caddy/Caddyfile`:
+
+```
+turneringsportal.kjaer-thomsen.dk {
+	reverse_proxy pool-app:3000
+}
+
+oskar.kjaer-thomsen.dk {
+	reverse_proxy portfolio-app:8080
+}
+```
+
+**Setting up a new server from scratch:**
+
+1. DNS: A records for both domains pointing at the server's public IP.
+2. `docker network create web`
+3. Start both apps (`docker compose up -d --build` in each repo, with its
+   `.env`).
+4. In `~/Projects/caddy`: `docker compose up -d`, then
+   `docker compose logs -f caddy` until both certificates are obtained.
 
 ## Current gaps / known TODOs
 
