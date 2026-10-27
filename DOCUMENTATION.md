@@ -66,8 +66,8 @@ docker-compose.yml             Local SQL Server 2022 container
 file-based route (`/Blog/Post/{slug}`). An unknown slug returns 404.
 
 Header nav: About, Blog, Contact, plus GitHub/LinkedIn icon links. Footer:
-quick links (Skills and Projects anchors on the home page, About, Blog,
-Contact), email/phone, and the same social links.
+quick links (Skills and Projects anchors on the home page; the pages are
+already in the header), email/phone, and the same social links.
 
 ## Data model
 
