@@ -612,7 +612,7 @@ public static class SeedData
             RepositoryUrl = "https://github.com/okthomsen/Video-platform-TV2",
             HasDetailPage = true,
             Featured = true,
-            SortOrder = 2,
+            SortOrder = 4,
             Technologies =
             [
                 new ProjectTechnology { Name = "Microservices", SortOrder = 1 },
@@ -652,7 +652,7 @@ public static class SeedData
             RepositoryUrl = "https://github.com/OKThomsen/Portfolio-Website",
             HasDetailPage = false,
             Featured = true,
-            SortOrder = 4,
+            SortOrder = 2,
             Technologies =
             [
                 new ProjectTechnology { Name = "ASP.NET Core", SortOrder = 1 },
