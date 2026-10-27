@@ -279,56 +279,160 @@ public static class SeedData
                 Slug = "building-a-pool-tournament-platform",
                 Title = "Building a Tournament Platform for My Local Pool Club",
                 Excerpt = "How I replaced a pool club's Excel sheets with a TypeScript web app that runs its weekly tournaments, updates live on players' phones and the club's TV, and is self-hosted with Docker and Caddy.",
-                // DRAFT article body for Oskar to review/expand — built only from what the
-                // pool-tournament-app repository shows (README, DOCUMENTATION.md, code, config).
+                // Built from what the pool-tournament-app repository shows (DOCUMENTATION.md,
+                // decisions log, code, config). Screenshots are from a local copy of the app
+                // with made-up players, not the club's real data.
                 Body = """
                     <p>
-                        My local pool hall ran its weekly tournaments and season standings from
-                        Excel sheets. I built a web app to replace them, and it now runs in
-                        production on a server I host myself.
+                        Every Wednesday, Frank's Poolhouse in Odense runs a tournament, and the
+                        club kept its pools, brackets, season standings and handicaps in an Excel
+                        workbook. I built a web app to replace it. It now runs the tournaments in
+                        production at
+                        <a href="https://turneringsportal.kjaer-thomsen.dk" target="_blank" rel="noopener">turneringsportal.kjaer-thomsen.dk</a>,
+                        on a server I host myself.
                     </p>
-                    <h2>What it does</h2>
-                    <ul>
-                        <li>An admin creates a tournament, draws the players into pools and can rearrange them by drag and drop</li>
-                        <li>Players enter their own match results from their phones using a join code</li>
-                        <li>Pool tables, the knockout bracket and the season leaderboard update live, including on a TV screen in the club</li>
-                        <li>Season points and player handicaps are tracked across tournaments</li>
-                    </ul>
+                    <p>
+                        I built it alone over about five weeks in the autumn of 2026. The club's
+                        product owner wrote a functional spec and made wireframes in Figma, and
+                        the old workbook served as the reference implementation: when the spec
+                        didn't cover a rule, the app does what the workbook did.
+                    </p>
+                    <h2>An evening with the app</h2>
+                    <p>
+                        <strong>Setting up.</strong> The tournament director creates a tournament,
+                        picks the format and adds tonight's players with a search that matches the
+                        start of any word in a name, so a known player is a couple of letters and
+                        Enter away. The app shows how the players will be split into pools as the
+                        list grows.
+                    </p>
+                    <figure>
+                        <img src="/img/blog/pool/admin-create-tournament.png" width="1440" height="1072" loading="lazy"
+                             alt="The New tournament form with a date, a format menu set to 8-ball, checkboxes for Just for fun and Pairs, a search box for adding players, and a table of ten players with their handicaps and membership. Below it: 10 players, pools 5 + 5.">
+                        <figcaption>Creating a tournament. The line under the table shows the pool split.</figcaption>
+                    </figure>
+                    <p>
+                        The players are drawn into pools at random. The director can then drag a
+                        player onto another to swap them, move a player to another pool, or start
+                        a new pool, and choose how many frames each pool's matches are played to.
+                        The join code for players is shown in the admin panel on the right.
+                    </p>
+                    <figure>
+                        <img src="/img/blog/pool/admin-draft-pools.png" width="1440" height="957" loading="lazy"
+                             alt="The tournament page before play starts: two pools of five players that can be rearranged by drag and drop, a Race to field under each pool, Randomize and Go to tournament buttons, and an admin panel showing the six-digit code for /play.">
+                        <figcaption>The drawn pools, ready to be rearranged before play starts.</figcaption>
+                    </figure>
+                    <p>
+                        <strong>Playing.</strong> Players enter their own results on their phones.
+                        They open <code>/play</code>, type the six-digit code from the director,
+                        and tap a match to pick the score. The pool table, standings and "Up next"
+                        update for everyone as soon as a result is in.
+                    </p>
+                    <figure>
+                        <div class="figure-row">
+                            <img src="/img/blog/pool/play-join-code.png" width="780" height="1688" loading="lazy"
+                                 alt="Phone screen titled Enter results, with a field for the code and a Join button.">
+                            <img src="/img/blog/pool/play-mobile.png" width="780" height="1688" loading="lazy"
+                                 alt="Phone screen showing pool A as a grid of results in green and red, each player's wins and rank, and an Up next box listing the next two matches and who sits out.">
+                            <img src="/img/blog/pool/play-mobile-score-dialog.png" width="780" height="1688" loading="lazy"
+                                 alt="Phone screen with a dialog for the match Clara Juul against Noah Friis, race to 2, offering the scores 2-0, 2-1, 1-2 and 0-2.">
+                        </div>
+                        <figcaption>On <code>/play</code>: joining with the code, the pool table, and entering a score.</figcaption>
+                    </figure>
+                    <p>
+                        <strong>On the TV.</strong> A flatscreen in the club shows
+                        <code>/live</code>: the pool tables and "Up next" during pool play, the
+                        bracket during the knockout, a podium when the tournament is concluded,
+                        and the season leaderboard between tournaments.
+                    </p>
+                    <figure>
+                        <img src="/img/blog/pool/live-pools-tv.png" width="1920" height="1080" loading="lazy"
+                             alt="Dark full-screen view with the Frank's Poolhouse logo and a Live badge, showing pools A and B side by side with results, wins and ranks, an Up next panel under each pool, and the address for entering results in the top right.">
+                        <figcaption>The <code>/live</code> view during pool play, at TV resolution.</figcaption>
+                    </figure>
+                    <figure>
+                        <div class="figure-row">
+                            <img src="/img/blog/pool/live-bracket-tv.png" width="1920" height="1080" loading="lazy"
+                                 alt="The knockout on /live: two semifinals with seeds drawn as numbered pool balls, one semifinal won 3-1, and a third-place final and final waiting for players.">
+                            <img src="/img/blog/pool/live-podium-tv.png" width="1920" height="1080" loading="lazy"
+                                 alt="The /live podium after the tournament: Congratulations to the winners, with the top three names above wooden steps marked with the 1, 2 and 3 balls.">
+                        </div>
+                        <figcaption>The knockout, and the podium that appears when the director concludes the tournament.</figcaption>
+                    </figure>
+                    <p>
+                        After the pools, the app qualifies players for the knockout and seeds
+                        them, keeping players from the same pool apart in the first round. When
+                        the final is played, concluding the tournament gives every player a
+                        placement and season points. Members get a bonus, and handicaps are
+                        reviewed the way the workbook did it.
+                    </p>
                     <h2>Architecture</h2>
                     <p>
-                        The app is a TypeScript monorepo with three packages. The tournament rules
-                        (pool scheduling, standings, qualification, knockout seeding and handicaps)
-                        live in a pure domain package with no database or HTTP code, so the same
-                        logic is shared by the backend and the frontend and can be unit tested on
-                        its own. The backend is a Node.js API built with Fastify on top of
-                        PostgreSQL, and the frontend is a React app built with Vite.
+                        The app is a TypeScript monorepo with three packages:
                     </p>
-                    <h2>Live updates</h2>
+                    <ul>
+                        <li><strong>core</strong>: the tournament rules as pure functions with no database or HTTP code: pool splits and draws, round-robin schedules, standings, qualification, seeding, the bracket, placements, points, seasons and handicaps</li>
+                        <li><strong>server</strong>: a Fastify REST API on PostgreSQL with Drizzle ORM. It also serves the built frontend, so the whole app is one container</li>
+                        <li><strong>web</strong>: a React app built with Vite, using TanStack Query for data fetching. The interface is in Danish and English</li>
+                    </ul>
                     <p>
-                        When a result is entered, the server tells every open page that the
-                        tournament changed, using Server-Sent Events. The event carries no data;
-                        each page refetches what it shows. That keeps the server side simple, which
-                        is enough for an app running as a single server process.
+                        Both the server and the frontend use the core package, so a rule exists in
+                        one place. Randomness, such as the pool draw, is passed into the functions,
+                        so tests can use a seeded generator and get the same draw every time.
+                    </p>
+                    <h2>Design decisions</h2>
+                    <p>
+                        <strong>Ties are flagged, not guessed.</strong> Players in a pool are
+                        ranked by matches won, then frame difference, then head-to-head, with a
+                        mini-league between them when three or more are level. Some ties can't be
+                        broken that way, such as A beating B, B beating C and C beating A. The app
+                        flags those, and the director decides the order.
+                    </p>
+                    <p>
+                        <strong>Live updates without state on the wire.</strong> When something
+                        changes, the server sends a Server-Sent Event that only says which
+                        tournament changed, and each open page refetches what it shows. Pages
+                        can't drift out of sync, and the event bus can stay in memory because the
+                        app runs as one server process. The first event also carries a version
+                        hash of the frontend, so the TV in the club reloads itself after a deploy.
+                    </p>
+                    <p>
+                        <strong>A screen nobody can scroll.</strong> The TV has no mouse or
+                        keyboard, so <code>/live</code> is exactly one screen high. The pools or
+                        the bracket are laid out at their natural size and scaled to fill the
+                        screen. It uses a dark theme, which is easier to read in a dim bar.
+                    </p>
+                    <p>
+                        <strong>A code instead of player accounts.</strong> Asking every player to
+                        sign up would make self-scoring a hassle. Instead, each tournament gets a
+                        six-digit code that only admins see. It is never shown on
+                        <code>/live</code>, because people outside the tournament are in the bar
+                        too. A player can only enter a result in a match that doesn't have one,
+                        after confirming it. If two people enter the same match, the first result
+                        counts, and corrections are left to the director. Join attempts are rate
+                        limited.
+                    </p>
+                    <p>
+                        <strong>Rules enforced by the database too.</strong> Only one tournament
+                        can be in progress at a time, and a partial unique index in PostgreSQL
+                        guarantees that, not just the application code. Admin accounts can only
+                        be created with a command-line tool on the server, so there is no sign-up
+                        route to protect.
                     </p>
                     <h2>Testing</h2>
                     <p>
-                        The domain rules have unit tests, and the API is covered by integration
-                        tests that run against a real PostgreSQL database rather than mocks: around
-                        270 test cases in total, run with Vitest.
+                        The rules in the core package are unit tested, using results from the
+                        club's own workbook as fixtures. The API is covered by integration tests
+                        that run against a real PostgreSQL database rather than mocks. That's more
+                        than 260 test cases, run with Vitest.
                     </p>
                     <h2>Deployment</h2>
                     <p>
-                        The app is built into a single Docker image with a multi-stage build, where
-                        the API also serves the built frontend. On a Linux server, Docker Compose
-                        runs the app, PostgreSQL, Caddy as a reverse proxy with automatic HTTPS, and
-                        a backup container that takes a nightly database dump. Only Caddy is
-                        reachable from the internet.
-                    </p>
-                    <p>
-                        <em>
-                            This is a draft, and I'll add more about the design decisions and what I
-                            learned building the platform.
-                        </em>
+                        The app is built into a single Docker image with a multi-stage build. On a
+                        Linux server, Docker Compose runs the app, PostgreSQL, Caddy as a reverse
+                        proxy with automatic HTTPS, and a backup container that takes a nightly
+                        database dump. Only Caddy is reachable from the internet. The server
+                        applies database migrations when it starts, so an update is a
+                        <code>git pull</code> and a rebuild.
                     </p>
                     """,
                 PublishedOn = new DateOnly(2026, 10, 25),
