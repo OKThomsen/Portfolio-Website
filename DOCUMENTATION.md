@@ -22,7 +22,7 @@ src/Portfolio.Web/
   Program.cs                 Composition root: DI, migration + seed on startup, middleware pipeline
   Data/
     PortfolioDbContext.cs    EF Core DbContext + entity configuration
-    SeedData.cs              Idempotent seed of real project/skill/blog content
+    SeedData.cs              All site content; synced into the database on startup
   Models/
     Project.cs                Featured project entity
     ProjectTechnology.cs      Technology tag belonging to a Project
@@ -95,20 +95,24 @@ instead of inventing separate blog tags.
 `Program.cs` registers `PortfolioDbContext` with SQL Server, and on every
 startup it runs `db.Database.MigrateAsync()` then `SeedData.SeedAsync(db)`.
 
-Seeding is safe to run repeatedly and never overwrites existing rows:
+`SeedData.cs` is the **source of truth** for all content, and seeding is safe
+to run repeatedly:
 
-- Everything is seeded **per key**: a skill category by name, a skill by name
-  within its category, a project or blog post by slug. An item is inserted
-  only if its key isn't already in the database, so a new skill, project or
-  post added to `SeedData.cs` reaches databases seeded earlier.
-- Existing rows are never updated. Editing an existing item in `SeedData.cs`
-  will **not** change it in a database that already has it. New skills go at
-  the end of their category so old and new databases show the same order, and
-  a new project that should lead the list uses a lower `SortOrder` (the pool
-  tournament project uses 0) instead of renumbering the others.
-- `FindProjectAsync` resolves a post's `RelatedProject` from the change
-  tracker first, because the project may have been added in the same run but
-  not saved yet.
+- Every item is matched **by key**: a skill category by name, a skill by name
+  within its category, a project or blog post by slug, and a project
+  technology or post tag by name within its parent.
+- On every startup the database is made to match the file (`Sync`): changed
+  items are updated, new ones are added, and items removed from the file are
+  deleted. EF Core only writes the values that actually changed, so a startup
+  with no content changes writes nothing.
+- So editing a post, a project or a sort order in `SeedData.cs` and restarting
+  (or redeploying) is all it takes. Never edit content directly in the
+  database: the next startup puts it back.
+- Renaming a key (a slug or a skill name) counts as deleting the old item and
+  adding a new one.
+- Blog posts are listed in `BlogPosts()` with the slug of their related
+  project; projects are synced first, so a post can point at a project added in
+  the same run.
 
 The page models query EF Core directly and pass the entity types to the
 view. There is no caching, view-model or mapping layer:
@@ -225,8 +229,6 @@ To add a migration after changing a model:
   page exists yet.
 - `wwwroot/files/CV.pdf` is served, but no page links to it yet (`CLAUDE.md`
   wants a CV link in the hero).
-- Edits to existing skills/projects/posts in `SeedData.cs` don't reach an
-  already-seeded database; only new items do (see "Request flow").
 - No automated tests exist yet.
 - Not yet deployed. No Dockerfile for the app, no CI/CD pipeline and no
   hosting setup.
