@@ -1,0 +1,10 @@
+**/bin/
+**/obj/
+.git
+.vs
+.vscode
+.idea
+.env
+# Personal files in the repo root (the served CV is in src/Portfolio.Web/wwwroot/files)
+/*.pdf
+/*.md

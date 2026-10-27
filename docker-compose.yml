@@ -2,13 +2,38 @@ services:
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: portfolio-sqlserver
+    restart: unless-stopped
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
+      # Express is free for production use (10 GB per database); the default,
+      # Developer, isn't licensed for production.
+      MSSQL_PID: Express
+      MSSQL_MEMORY_LIMIT_MB: 2048
     ports:
       - "14330:1433"
     volumes:
       - portfolio-sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q 'SELECT 1' -b -o /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      ConnectionStrings__PortfolioDb: "Server=sqlserver,1433;Database=PortfolioDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;"
+      # Trust X-Forwarded-For/-Proto, so behind a reverse proxy (Caddy) the app
+      # sees the visitor's address and that the request came in over HTTPS.
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+    ports:
+      - "${APP_PORT:-8090}:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
 
 volumes:
   portfolio-sqlserver-data:

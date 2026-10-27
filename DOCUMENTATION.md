@@ -7,8 +7,8 @@ direction see `CLAUDE.md`; this file covers how the code is put together.
 
 - **ASP.NET Core 10** (Razor Pages, server-rendered — no Blazor, no SPA framework)
 - **Entity Framework Core 10** (`Microsoft.EntityFrameworkCore.SqlServer`)
-- **SQL Server 2022**, run locally via Docker
-- **Docker Compose** for local infrastructure only (the app itself runs via `dotnet run`, not containerized yet)
+- **SQL Server 2022** (Express edition), run in Docker
+- **Docker Compose** runs the app and SQL Server together; `dotnet run` still works for development
 - Plain CSS and a small vanilla JS file — no frontend build step or npm dependencies
 
 Chosen deliberately over a JS framework so the site itself functions as a
@@ -48,8 +48,9 @@ src/Portfolio.Web/
     files/CV.pdf              Served copy of the CV
   appsettings.json             Base config (no secrets)
   appsettings.Development.json Dev-only config, including the local DB connection string
-docker-compose.yml             Local SQL Server 2022 container
-.env / .env.example            SA password for the compose SQL Server container
+Dockerfile / .dockerignore     App image (multi-stage: SDK build, ASP.NET runtime)
+docker-compose.yml             The app and SQL Server 2022 containers
+.env / .env.example            SA password and the app's published port
 ```
 
 ## Routes
@@ -185,12 +186,20 @@ content (about copy, education cards, contact cards) is hardcoded in the
 
 ## Configuration & secrets
 
-- `ConnectionStrings:PortfolioDb` lives in `appsettings.Development.json`,
-  which is **tracked in git** (not gitignored). It points at
-  `localhost,14330`, matching the port mapping in `docker-compose.yml`.
+- For `dotnet run`, `ConnectionStrings:PortfolioDb` lives in
+  `appsettings.Development.json`, which is **tracked in git** (not
+  gitignored). It points at `localhost,14330`, matching the port mapping in
+  `docker-compose.yml`.
 - `docker-compose.yml` takes the SQL `sa` password from `.env`
   (`MSSQL_SA_PASSWORD`), which is gitignored. `.env.example` documents the
-  expected shape with a placeholder value.
+  expected shape with a placeholder value. The `app` container gets its
+  connection string from compose as the `ConnectionStrings__PortfolioDb`
+  environment variable (pointing at `sqlserver,1433` on the Docker network),
+  and runs in the Production environment, so it never reads
+  `appsettings.Development.json`.
+- The app container sets `ASPNETCORE_FORWARDEDHEADERS_ENABLED=true`, so
+  behind a reverse proxy it trusts `X-Forwarded-For`/`X-Forwarded-Proto` and
+  knows a request came in over HTTPS.
 - Both the compose password and the connection string use the same
   hardcoded dev-only password (`DevOnly_ChangeMe!123`). This is fine for local
   dev but must not be reused anywhere real credentials matter. A production
@@ -204,14 +213,29 @@ content (about copy, education cards, contact cards) is hardcoded in the
 
 ## Running locally
 
-1. `docker compose up -d` — starts SQL Server 2022 on `localhost:14330`.
-   (Docker Desktop must be running first.)
+Docker Desktop must be running first. Copy `.env.example` to `.env` once.
+
+**Everything in Docker:** `docker compose up -d --build` builds the app image
+(`Dockerfile`: SDK image to publish, ASP.NET runtime image to run, as a non-root
+user) and starts it with SQL Server. The site is at `http://localhost:8090`
+(`APP_PORT` in `.env`). The app waits for SQL Server's health check before
+starting. Run the same command again after changing code or content.
+`docker compose logs -f app` follows the app's log.
+
+**App via `dotnet run`** (faster while developing):
+
+1. `docker compose up -d sqlserver` — starts only SQL Server on
+   `localhost:14330`.
 2. `dotnet run --launch-profile http` from `src/Portfolio.Web` — applies
    migrations, seeds content, serves at `http://localhost:5101`
    (`https://localhost:7233` under the `https` profile).
 
-No manual `dotnet ef database update` step is needed — migrations run
-automatically on startup (see `Program.cs`).
+Both use the same database. No manual `dotnet ef database update` step is
+needed — migrations run automatically on startup (see `Program.cs`).
+
+SQL Server runs as the **Express** edition (`MSSQL_PID`), which is free for
+production use; the image's default Developer edition isn't. Its memory is
+capped at 2 GB (`MSSQL_MEMORY_LIMIT_MB`).
 
 To add a migration after changing a model:
 `dotnet ef migrations add <Name>` from `src/Portfolio.Web` (requires the
@@ -230,5 +254,5 @@ To add a migration after changing a model:
 - `wwwroot/files/CV.pdf` is served, but no page links to it yet (`CLAUDE.md`
   wants a CV link in the hero).
 - No automated tests exist yet.
-- Not yet deployed. No Dockerfile for the app, no CI/CD pipeline and no
-  hosting setup.
+- Not yet deployed. The app is containerized, but there is no production
+  setup yet (reverse proxy with HTTPS, backups) and no CI/CD pipeline.
