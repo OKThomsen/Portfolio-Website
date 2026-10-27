@@ -68,9 +68,4 @@ docker-compose.yml    The app and SQL Server
 
 The `production` branch is what the server runs. It adds `docker-compose.prod.yml`, which
 publishes no ports and puts the app on a Docker network shared with a Caddy reverse proxy. Caddy
-serves this site and my [pool tournament platform](https://github.com/OKThomsen/pool-tournament-app)
-from the same server, with HTTPS certificates from Let's Encrypt. Deploying is a merge of `main`
-into `production`, then `git pull && docker compose up -d --build` on the server.
-
-More detail, including the data model, is in [DOCUMENTATION.md](DOCUMENTATION.md); the server
-setup is documented there on the `production` branch.
+serves this site with HTTPS certificates from Let's Encrypt. Updates `docker compose up -d --build` on the server.
