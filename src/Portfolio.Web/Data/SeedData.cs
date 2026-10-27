@@ -39,33 +39,161 @@ public static class SeedData
                 Slug = "masters-thesis-satellite-pesticide-detection",
                 Title = "My Master's Thesis: Satellite-Based Detection of Pesticide Overuse",
                 Excerpt = "A summary of my master's thesis on using Sentinel-2 satellite imagery to flag likely overuse of pre-harvest desiccant on Danish potato fields, for a case brought by the Danish Environmental Protection Agency.",
-                // DRAFT article body for Oskar to review/expand before publishing — built from the
-                // verified Purpose/EngineeringNotes fields already in the Project seed above.
-                // Contribution details are still a TODO there too, so this draft stays general
-                // about "we"/the project rather than claiming specific individual work.
+                // Every fact, number and figure is taken from the thesis report
+                // (Satellite_Based_Detection_of_Pesticide_Overuse_Final.pdf). The system was built
+                // jointly, so the post says "we" and doesn't split the work per author.
                 Body = """
                     <p>
-                        For my master's thesis, I worked on a case brought by the Danish
-                        Environmental Protection Agency (Miljøstyrelsen): detecting when farmers
-                        were applying excessive pre-harvest desiccant to potato crops. The idea is
-                        that an unusually steep drop in a field's vegetation index during the
-                        desiccation window can indicate overuse, and that drop is visible from
-                        space.
+                        For our master's thesis in Software Engineering at the University of
+                        Southern Denmark, Anton Christensen and I worked on a case from the Danish
+                        Environmental Protection Agency (Miljøstyrelsen): could satellite imagery
+                        help the agency decide which potato fields to inspect for overuse of
+                        pre-harvest desiccants?
+                    </p>
+                    <h2>The problem</h2>
+                    <p>
+                        Before harvest, seed potato farmers spray a desiccant that kills the plant
+                        above ground, so the potatoes stop growing and the skin hardens. The
+                        chemicals can leach into groundwater and harm nearby wildlife, so the
+                        agency regulates how much and how often they may be applied. Compliance is
+                        checked with soil samples, but there are fewer than a thousand inspections a
+                        year (746 in 2019), and the sites are picked at random.
                     </p>
                     <p>
-                        The project pulled and processed Sentinel-2 satellite imagery via its API,
-                        computing vegetation indices across the desiccation period for individual
-                        fields. Data processing was structured as a pipeline using RabbitMQ for
-                        messaging and Docker for containerization, with results stored in MySQL.
+                        The agency's idea was to use the vegetation index NDVI, which can be
+                        calculated from Sentinel-2 satellite data. A desiccant makes a field's NDVI
+                        drop, and a field whose NDVI drops faster than normal might have been
+                        sprayed too heavily. A list of suspicious fields would be a better basis for
+                        choosing inspections than chance.
+                    </p>
+                    <h2>What we built</h2>
+                    <p>
+                        A Python system that collects satellite data for every field of a given
+                        crop type in Denmark and turns it into vegetation index time series:
+                    </p>
+                    <ul>
+                        <li>A database populator reads the agency's public GIS shapefile of all Danish fields, filters it by crop type, and stores each field's ID, crop type and polygon in MySQL</li>
+                        <li>Download workers ask the Sentinel Hub Catalog API which dates have imagery for a field, including cloud cover, and download the raw spectral bands as GeoTIFFs from the Process API</li>
+                        <li>Processing workers read the GeoTIFFs with Rasterio, check the data mask for invalid pixels, calculate NDVI, NDRE, GNDVI and EVI per pixel, and store the results or render heatmaps and KDE plots</li>
+                        <li>RabbitMQ distributes the work. A work order (for example "download field data for August") is split into tasks of at most ten days, which are spread across the running workers</li>
+                    </ul>
+                    <h2>Engineering decisions</h2>
+                    <p>
+                        <strong>Raw bands instead of ready-made statistics.</strong> Sentinel Hub
+                        can compute an index or an average for a field on its own servers, which
+                        is cheaper. We downloaded the raw reflectance bands instead, because that
+                        let us check the data per pixel, draw heatmaps, and calculate new indices
+                        later without downloading everything again. We chose Sentinel Hub over
+                        openEO because it is a plain REST API and doesn't tie the project to
+                        Python.
                     </p>
                     <p>
-                        <em>
-                            This is a draft summary — a fuller write-up of the specific engineering
-                            decisions, results, and my individual contribution is still to come.
-                        </em>
+                        <strong>A relational database.</strong> The agency suggested a time series
+                        database. We chose MySQL because the data is relational (fields and their
+                        readings per date), and because during exploration we kept updating data
+                        and changing the schema, which time series databases handle poorly.
                     </p>
+                    <p>
+                        <strong>Parallel workers.</strong> The workload is I/O-bound: most of the
+                        time goes to waiting for the API and the database. Python's Global
+                        Interpreter Lock rules out simple multithreading, so we ran several worker
+                        processes fed by RabbitMQ. In a test with ten fields and 30 days of data,
+                        one worker took 119 seconds and four workers took 32 seconds. The time per
+                        day of data stayed at about 4.3 seconds, so adding workers did not slow
+                        each one down.
+                    </p>
+                    <p>
+                        <strong>Long-running tasks in RabbitMQ.</strong> A download task could run
+                        for over an hour, but RabbitMQ drops a consumer that runs too long, and our
+                        worker blocked the heartbeat while waiting for a task to finish. We moved
+                        task execution to a separate thread with a callback, raised the timeout to
+                        two hours, and capped each task at ten days of data to stay within it.
+                    </p>
+                    <p>
+                        <strong>Bounding boxes or individual fields.</strong> Instead of one
+                        request per field, the system can download large bounding boxes and cut
+                        the fields out afterwards. On Funen this was about 29 times faster (163
+                        seconds for 40 boxes against 4,824 seconds for 1,993 fields), but the
+                        per-field downloads followed the field borders more closely and gave more
+                        accurate readings. We kept both modes, so speed can be traded for accuracy.
+                    </p>
+                    <h2>Results</h2>
+                    <p>
+                        The data told a clear story. On a typical seed potato field, NDVI starts
+                        rising in mid-May, holds just below 0.8 through June and July, falls to
+                        about 0.6 between 7 and 15 August, which matches the timing of a
+                        desiccant, and drops to near zero at harvest in October.
+                    </p>
+                    <figure>
+                        <img src="/img/blog/thesis/ndvi-season-field-2443.png" width="1000" height="500" loading="lazy"
+                             alt="Line chart of minimum, maximum, average and median NDVI for field 2443 through 2020. NDVI is low until May, peaks around 0.8 in June and July, falls steeply in August, and reaches near zero in mid-October.">
+                        <figcaption>NDVI through 2020 for one certified seed potato field (field 2443), from days with at most 25% cloud cover.</figcaption>
+                    </figure>
+                    <p>
+                        The heatmaps show the same drop across the whole field, pixel by pixel:
+                    </p>
+                    <figure>
+                        <div class="figure-row">
+                            <img src="/img/blog/thesis/ndvi-heatmap-2020-08-07.png" width="640" height="480" loading="lazy"
+                                 alt="NDVI heatmap of field 2443 on 7 August 2020, almost entirely green at around 0.8.">
+                            <img src="/img/blog/thesis/ndvi-heatmap-2020-08-15.png" width="640" height="480" loading="lazy"
+                                 alt="NDVI heatmap of field 2443 on 15 August 2020, pale green and yellow at around 0.6.">
+                            <img src="/img/blog/thesis/ndvi-heatmap-2020-08-30.png" width="640" height="480" loading="lazy"
+                                 alt="NDVI heatmap of field 2443 on 30 August 2020, orange and red at around 0.2.">
+                        </div>
+                        <figcaption>Field 2443 on 7, 15 and 30 August 2020.</figcaption>
+                    </figure>
+                    <p>
+                        Seed potatoes could also be told apart from starch potatoes, sugar beets
+                        and apple orchards by their NDVI curves alone. Starch potatoes are usually
+                        left to wilt naturally, so their NDVI falls later and more gradually.
+                    </p>
+                    <figure>
+                        <div class="figure-row">
+                            <img src="/img/blog/thesis/ndvi-seed-potatoes.png" width="1000" height="500" loading="lazy"
+                                 alt="Average NDVI from August to October 2020 for ten seed potato fields. Several fall from around 0.8 to below 0.4 by mid-August, and the rest are already low in early August.">
+                            <img src="/img/blog/thesis/ndvi-starch-potatoes.png" width="1000" height="500" loading="lazy"
+                                 alt="Average NDVI from August to October 2020 for ten starch potato fields. All stay above 0.6 through mid-August, then decline gradually through September and October.">
+                        </div>
+                        <figcaption>Average NDVI from August to October 2020 for ten seed potato fields (left) and ten starch potato fields (right).</figcaption>
+                    </figure>
+                    <p>
+                        We developed three methods for scoring possible overuse: comparing the
+                        decline of NDVI with that of NDRE (which measures deeper into the plant than
+                        the leaf canopy), finding each field's steepest NDVI drop, and comparing the
+                        NDVI and NDRE gradients. Each method produces a ranked list of fields.
+                    </p>
+                    <figure>
+                        <img src="/img/blog/thesis/ndvi-ndre-field-2443.png" width="1000" height="500" loading="lazy"
+                             alt="Line chart of average NDVI and average NDRE for field 2443 through 2020. Both follow the same shape, with NDRE lower than NDVI, and NDVI falling more steeply in August.">
+                        <figcaption>Average NDVI and NDRE for field 2443. NDVI falls more steeply than NDRE after the desiccant is applied.</figcaption>
+                    </figure>
+                    <h2>What didn't work</h2>
+                    <p>
+                        To validate the scores, we needed ground truth: fields where the agency
+                        knew whether desiccants had been used correctly or overused. The agency
+                        could not share this data because of GDPR, and the farmers we contacted
+                        declined. Our contact at the agency also left partway through the project,
+                        so the requirements were never validated with the stakeholder.
+                    </p>
+                    <p>
+                        Clouds were the other problem. Readings with more than 25% cloud cover were
+                        too noisy to use, so some fields had gaps of weeks, often around the
+                        desiccation date. The scoring methods ranked the same fields very
+                        differently, and without ground truth we could not tell which one was
+                        right. The steepest-drop NDVI ranking was the most reliable of the three,
+                        and we argued it is still a better starting point for inspections than
+                        random selection. But the question of whether overuse can be detected
+                        remains open.
+                    </p>
+                    <h2>Next steps</h2>
+                    <ul>
+                        <li>Get ground truth, either from the agency's internal data or from test data from desiccant manufacturers</li>
+                        <li>Compare NDVI and NDRE over the whole desiccation period instead of only the steepest drop</li>
+                        <li>With enough ground truth, train a machine learning model that also includes weather and cloud cover data</li>
+                    </ul>
                     """,
-                // TODO: replace with the actual thesis submission/defense date.
+                // TODO: replace with the actual thesis defense date (the report was handed in 2025-06-01).
                 PublishedOn = new DateOnly(2025, 6, 15),
                 RelatedProject = await FindProjectAsync(db, "satellite-pesticide-detection"),
                 Tags =
@@ -327,7 +455,7 @@ public static class SeedData
             Title = "Satellite-Based Detection of Pesticide Overuse",
             Summary = "Analyzed Sentinel-2 satellite imagery to flag likely overuse of pre-harvest desiccant on Danish potato fields, for a case brought by the Danish Environmental Protection Agency.",
             Purpose = "The Danish EPA (Miljøstyrelsen) wanted a way to detect when farmers were applying excessive pre-harvest desiccant to potato crops. This master's thesis project used satellite data to calculate vegetation indices over the desiccation period, where an unusually steep drop in vegetation index can indicate overuse.",
-            Contribution = "TODO — Oskar to confirm individual contribution details for the site copy.",
+            Contribution = "Designed and built jointly with Anton Christensen as a two-person master's thesis.",
             EngineeringNotes = "Pulled and processed Sentinel-2 API data, computed vegetation indices across the desiccation window, and used RabbitMQ and Docker to structure the data processing pipeline, with results stored in MySQL.",
             RepositoryUrl = "https://github.com/anton4d/Satellite-Based_Detection_of_Pesticide_Overuse",
             HasDetailPage = true,
