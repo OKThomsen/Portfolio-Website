@@ -12,41 +12,43 @@
         </header>
         <div class="about-layout">
             <div class="about-prose">
-                <!-- DRAFT copy for Oskar to review/edit before publishing -->
                 <p>
                     I finished a Master's in Software Engineering at the University of
                     Southern Denmark in 2025, after a Bachelor's in the same program. My
-                    project work spans backend and data-processing systems &mdash; from a
-                    satellite-imagery pipeline built for the Danish Environmental Protection
-                    Agency to a microservice-based streaming platform mockup and an embedded
-                    wildlife-monitoring system that uses a local LLM for image annotation.
+                    latest project runs the weekly tournaments at a local pool club, in
+                    production, from the players' phones to the TV in the club. Before that,
+                    my master's thesis was a satellite data pipeline for a case from the
+                    Danish Environmental Protection Agency, and I built an embedded wildlife
+                    camera that annotates its images with a local LLM.
                 </p>
                 <p>
-                    I'm currently focused on moving into the Microsoft ecosystem &mdash;
-                    ASP.NET Core, Entity Framework Core, SQL Server, and Azure &mdash; and
-                    this site is built on that stack as a working example of it, not just a
-                    claim on a resume.
+                    I'm moving into the Microsoft ecosystem, and this site is my first
+                    project in it: ASP.NET Core, Entity Framework Core and SQL Server,
+                    running in Docker on a server I host myself. It's a working example of
+                    the stack, not just a claim on a resume.
                 </p>
             </div>
             <aside class="about-aside">
                 <div class="about-card">
-                    <p class="eyebrow">Recent project</p>
+                    <p class="eyebrow">How this site is built</p>
                     <h3>This portfolio site</h3>
                     <p>
-                        Built with ASP.NET Core Razor Pages, Entity Framework Core, and SQL
-                        Server. The projects and skills shown here are served from the
-                        database through EF Core rather than hard-coded into the markup.
+                        Built with ASP.NET Core Razor Pages, Entity Framework Core and SQL
+                        Server, and self-hosted with Docker. The projects, skills and blog
+                        posts are served from the database rather than hard-coded into the
+                        markup.
                     </p>
                     <div class="about-card__links">
                         <a href="https://github.com/OKThomsen/Portfolio-Website" target="_blank" rel="noopener">Source code</a>
+                        <a asp-page="/Blog/Post" asp-route-slug="building-this-portfolio-website">Blog post</a>
                     </div>
                 </div>
                 <div class="about-card about-card--cta">
                     <p class="eyebrow">Want to work together?</p>
                     <h3>Open to software engineering roles</h3>
                     <p>
-                        I'm looking for backend and cloud work with C#/.NET, SQL, and Azure.
-                        If that's what you're hiring for, get in touch.
+                        I'm looking for my first full-time role as a software engineer. If
+                        you're hiring, I'd like to hear from you.
                     </p>
                     <a class="btn primary" asp-page="/Contact">Go to contact</a>
                 </div>
