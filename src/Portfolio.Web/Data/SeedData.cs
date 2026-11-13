@@ -175,7 +175,9 @@ public static class SeedData
             Contribution = "Built and deployed solo, from the data model and tournament rules to the production server.",
             EngineeringNotes = "A TypeScript monorepo where the tournament rules live in a pure domain package shared by a Fastify API and a React frontend. Changes reach open pages through Server-Sent Events, PostgreSQL schema changes go through versioned migrations, and the API is covered by integration tests against a real database.",
             Outcome = "Running in production on a self-hosted Linux server with Docker Compose, Caddy for automatic HTTPS, and nightly database backups.",
-            RepositoryUrl = "https://github.com/OKThomsen/pool-tournament-app",
+            // The source is private (live service for the club); this public repo holds
+            // only a README write-up and screenshots.
+            RepositoryUrl = "https://github.com/OKThomsen/franks-poolhouse-tournament-app",
             DemoUrl = "https://turneringsportal.kjaer-thomsen.dk",
             HasDetailPage = true,
             Featured = true,
@@ -540,9 +542,9 @@ public static class SeedData
             Slug = "building-a-pool-tournament-platform",
             Title = "Building a Tournament Platform for My Local Pool Club",
             Excerpt = "How I replaced a pool club's Excel sheets with a TypeScript web app that runs its weekly tournaments, updates live on players' phones and the club's TV, and is self-hosted with Docker and Caddy.",
-            // Built from what the pool-tournament-app repository shows (DOCUMENTATION.md,
-            // decisions log, code, config). Screenshots are from a local copy of the app
-            // with made-up players, not the club's real data.
+            // Built from the pool app's documentation and, since the source went private, the
+            // README of the public franks-poolhouse-tournament-app repository. Screenshots are
+            // from a local copy of the app with made-up players, not the club's real data.
             Body = """
                 <p>
                     Every Wednesday, Frank's Poolhouse in Odense runs a tournament, and the
@@ -553,10 +555,17 @@ public static class SeedData
                     on a server I host myself.
                 </p>
                 <p>
-                    I built it alone over about five weeks in the autumn of 2026. The club's
+                    I built the first version alone over about five weeks in the autumn of
+                    2026, and I've kept developing it together with the club since. The club's
                     product owner wrote a functional spec and made wireframes in Figma, and
                     the old workbook served as the reference implementation: when the spec
                     didn't cover a rule, the app does what the workbook did.
+                </p>
+                <p>
+                    The source code isn't public, because it's a live service that runs the
+                    club's real tournaments. A
+                    <a href="https://github.com/OKThomsen/franks-poolhouse-tournament-app" target="_blank" rel="noopener">public repository</a>
+                    has a summary of the app and its screenshots.
                 </p>
                 <h2>An evening with the app</h2>
                 <p>
@@ -623,9 +632,58 @@ public static class SeedData
                     After the pools, the app qualifies players for the knockout and seeds
                     them, keeping players from the same pool apart in the first round. When
                     the final is played, concluding the tournament gives every player a
-                    placement and season points. Members get a bonus, and handicaps are
-                    reviewed the way the workbook did it.
+                    placement and season points. Members get a bonus, and every player's
+                    handicap is reviewed.
                 </p>
+                <p>
+                    Tournaments come in a few kinds: 8-, 9- or 10-ball, a "just for fun" night
+                    that gives no points, and doubles, where teams of two play as one entrant.
+                    When the pool matches still to be played can't change who goes through,
+                    the knockout can start early, alongside them.
+                </p>
+                <h2>Between tournaments</h2>
+                <p>
+                    <strong>Player pages.</strong> Every player has a page with their
+                    statistics, their match and frame record, their place in each season and
+                    every tournament they played, filterable by season. A head-to-head lets
+                    you pick from a dropdown of everyone the player has met, or type a name,
+                    and shows the record between the two, with the matches behind it.
+                </p>
+                <figure>
+                    <div class="figure-row">
+                        <img src="/img/blog/pool/player-page.png" width="1440" height="1116" loading="lazy"
+                             alt="A player's page: season points, tournaments, wins, semifinals, quarterfinals, matches and frames as small tiles, then a head-to-head against another player showing a 5-4 record and a table of the nine matches between them.">
+                        <img src="/img/blog/pool/player-opponents.png" width="1440" height="840" loading="lazy"
+                             alt="The head-to-head's opponent field opened as a dropdown, listing each opponent with the player's wins and losses against them.">
+                    </div>
+                    <figcaption>A player's page with a head-to-head, and the dropdown of everyone they've played.</figcaption>
+                </figure>
+                <p>
+                    <strong>Seasons.</strong> There are two a year, with a leaderboard for the
+                    current season and every earlier one. Tournaments from before the app can
+                    be entered by hand from just their placings, so the history isn't lost.
+                </p>
+                <p>
+                    <strong>Handicaps.</strong> The app keeps a hidden regulation score for
+                    each player, based on their results, and recommends a handicap change when
+                    one is due. An admin applies or dismisses it.
+                </p>
+                <p>
+                    <strong>The club's frontpage.</strong> The frontpage shows a monthly
+                    calendar of coming events, the club's info as a text the admins edit in
+                    both languages, and the season leaderboard. A gallery holds photos from
+                    tournament nights, searchable by player, date, format and season, and a
+                    tournament's page shows its winner photo.
+                </p>
+                <figure>
+                    <div class="figure-row">
+                        <img src="/img/blog/pool/season.png" width="1440" height="1000" loading="lazy"
+                             alt="The Season 2/2026 page: a season picker, a player search, and a sortable table of players with season points, membership, tournaments, wins, semifinals and quarterfinals, the top three marked with numbered pool balls.">
+                        <img src="/img/blog/pool/frontpage.png" width="1440" height="1000" loading="lazy"
+                             alt="The frontpage: the Frank's Poolhouse logo with the club's training and tournament times and address, a dark monthly calendar with event days marked as pool balls, and the season leaderboard below it.">
+                    </div>
+                    <figcaption>The season leaderboard, and the frontpage with the calendar.</figcaption>
+                </figure>
                 <h2>Architecture</h2>
                 <p>
                     The app is a TypeScript monorepo with three packages:
@@ -633,7 +691,7 @@ public static class SeedData
                 <ul>
                     <li><strong>core</strong>: the tournament rules as pure functions with no database or HTTP code: pool splits and draws, round-robin schedules, standings, qualification, seeding, the bracket, placements, points, seasons and handicaps</li>
                     <li><strong>server</strong>: a Fastify REST API on PostgreSQL with Drizzle ORM. It also serves the built frontend, so the whole app is one container</li>
-                    <li><strong>web</strong>: a React app built with Vite, using TanStack Query for data fetching. The interface is in Danish and English</li>
+                    <li><strong>web</strong>: a React app built with Vite, using TanStack Query for data fetching and dnd-kit for dragging players between pools. The interface is in Danish and English</li>
                 </ul>
                 <p>
                     Both the server and the frontend use the core package, so a rule exists in
@@ -665,12 +723,11 @@ public static class SeedData
                 <p>
                     <strong>A code instead of player accounts.</strong> Asking every player to
                     sign up would make self-scoring a hassle. Instead, each tournament gets a
-                    six-digit code that only admins see. It is never shown on
-                    <code>/live</code>, because people outside the tournament are in the bar
-                    too. A player can only enter a result in a match that doesn't have one,
-                    after confirming it. If two people enter the same match, the first result
-                    counts, and corrections are left to the director. Join attempts are rate
-                    limited.
+                    six-digit code, shown on the TV in the club, and only the players know the
+                    site's address. Admins can replace the code at any time. A player can only
+                    enter a result in a match that doesn't have one, after confirming it. If
+                    two people enter the same match, the first result counts, and corrections
+                    are left to the director. Join attempts are rate limited.
                 </p>
                 <p>
                     <strong>Rules enforced by the database too.</strong> Only one tournament
@@ -684,14 +741,15 @@ public static class SeedData
                     The rules in the core package are unit tested, using results from the
                     club's own workbook as fixtures. The API is covered by integration tests
                     that run against a real PostgreSQL database rather than mocks. That's more
-                    than 260 test cases, run with Vitest.
+                    than 260 test cases, run with Vitest. Linting and type checks run across
+                    every package.
                 </p>
                 <h2>Deployment</h2>
                 <p>
                     The app is built into a single Docker image with a multi-stage build. On a
-                    Linux server, Docker Compose runs the app, PostgreSQL, Caddy as a reverse
-                    proxy with automatic HTTPS, and a backup container that takes a nightly
-                    database dump. Only Caddy is reachable from the internet. The server
+                    Linux server, Docker Compose runs it next to PostgreSQL and a backup
+                    container that takes a nightly database dump. HTTPS comes from a Caddy
+                    reverse proxy, which the server shares with this website. The server
                     applies database migrations when it starts, so an update is a
                     <code>git pull</code> and a rebuild.
                 </p>
